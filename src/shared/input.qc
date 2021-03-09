@@ -23,16 +23,7 @@ Handles impulse and whatnot
 */
 void Game_Input(void)
 {
-	if (input_buttons & INPUT_BUTTON0) {
-		Weapons_Primary();
-	} else if (input_buttons & INPUT_BUTTON4) {
-		Weapons_Reload();
-	} else if (input_buttons & INPUT_BUTTON3) {
-		Weapons_Secondary();
-	} else {
-		Weapons_Release();
-	}
-
+#ifdef SERVER
 	if (input_buttons & INPUT_BUTTON5) {
 		Player_UseDown(); 
 	} else {
@@ -43,26 +34,16 @@ void Game_Input(void)
 		Flashlight_Toggle();
 	}
 
-	if (cvar("sv_cheats") == 1) {
-		player pl = (player)self;
-
-		if (self.impulse == 102) {
-			// Respawn all the entities
-			for (entity a = world; (a = findfloat(a, ::identity, 1));) {
-				CBaseEntity caw = (CBaseEntity)a;
-				caw.Respawn();
-			}
-			bprint(PRINT_HIGH, "Respawning all map entities...\n");
-		}
-		
-		if (self.impulse == 103) {
-			for (entity a = world; (a = find(a, classname, "func_breakable"));) {
-				func_breakable caw = (func_breakable)a;
-				caw.Death();
-			}
-			bprint(PRINT_HIGH, "BREAK EVERYTHING!\n");
-		}
-	}
-	
 	self.impulse = 0;
+#endif
+
+	if (input_buttons & INPUT_BUTTON0) {
+		Weapons_Primary();
+	} else if (input_buttons & INPUT_BUTTON4) {
+		Weapons_Reload();
+	} else if (input_buttons & INPUT_BUTTON3) {
+		Weapons_Secondary();
+	} else {
+		Weapons_Release();
+	}
 }

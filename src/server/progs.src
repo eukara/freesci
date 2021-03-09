@@ -15,9 +15,10 @@
 
 ../../../src/gs-entbase/server.src
 ../../../src/gs-entbase/shared.src
-../shared/include.src
 
 defs.h
+
+../shared/include.src
 
 ../../../valve/src/server/monster_apache.qc
 ../../../valve/src/server/monster_alien_controller.qc
@@ -81,7 +82,6 @@ server.qc
 
 ../../../src/botlib/include.src
 
-input.qc
 ../../../valve/src/server/spawn.qc
 
 ../../../src/server/include.src

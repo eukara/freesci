@@ -36,4 +36,5 @@ w_chainsaw.qc
 w_hammer.qc
 weapons.qc
 ../../../valve/src/shared/weapon_common.qc
+input.qc
 #endlist
