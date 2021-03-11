@@ -16,8 +16,7 @@
 
 var int autocvar_sh_scialert = FALSE;
 var int autocvar_sh_scispeed = 40;
-var int autocvar_sh_sciattack = TRUE;
-
+var int autocvar_sh_sciattack = FALSE;
 
 enum
 {
@@ -239,6 +238,8 @@ monster_scientist::Death(void)
 
 	/* now mark our state as 'dead' */
 	CBaseNPC::Death();
+	think = Respawn;
+	nextthink = time + 10.0f;
 }
 
 void
