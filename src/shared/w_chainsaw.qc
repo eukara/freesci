@@ -32,12 +32,11 @@ enum
 void w_chainsaw_precache(void)
 {
 #ifdef SERVER
-	precache_sound("sh/chainsaw_cutinto.wav");
-	precache_sound("sh/chainsaw_cutintoflesh.wav");
-	precache_sound("sh/chainsaw_idle.wav");
-	precache_sound("sh/chainsaw_idle2.wav");
-	precache_sound("sh/chainsaw_pullout.wav");
-	precache_sound("sh/chainsaw_startup.wav");
+	Sound_Precache("weapon_chainsaw.attack");
+	Sound_Precache("weapon_chainsaw.hit");
+	Sound_Precache("weapon_chainsaw.hitflesh");
+	Sound_Precache("weapon_chainsaw.idle");
+	Sound_Precache("weapon_chainsaw.startup");
 #else
 	precache_model("models/v_chainsaw.mdl");
 	precache_model("models/p_saw.mdl");
@@ -60,8 +59,14 @@ string w_chainsaw_deathmsg(void)
 
 void w_chainsaw_draw(void)
 {
+	player pl = (player)self;
+	
 	Weapons_SetModel("models/v_chainsaw.mdl");
 	Weapons_ViewAnimation(CHAINSAW_DEPLOY);
+	
+#ifdef SERVER
+	Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.startup");
+#endif
 }
 
 void w_chainsaw_holster(void)
@@ -85,7 +90,7 @@ void w_chainsaw_primary(void)
 	traceline(src, src + (v_forward * 32), FALSE, pl);
 	
 	if (trace_fraction >= 1.0) {
-		Weapons_PlaySound(pl, CHAN_WEAPON, "sh/chainsaw_idle2.wav", 1, ATTN_NORM);
+		Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.attack");
 		pl.w_attack_next = 0.2f;
 	} else {
 		int dmg;
@@ -93,15 +98,16 @@ void w_chainsaw_primary(void)
 		
 		if (trace_ent.takedamage) {
 			if (trace_ent.iBleeds) {
+				FX_Blood(trace_endpos, [1,0,0]);
 				/* Push the player towards the victim */
 				pl.velocity = normalize(trace_ent.origin - pl.origin) * 240;
 			}
 			dmg = Skill_GetValue("plr_chainsaw", 10);
 			Damage_Apply(trace_ent, self, dmg, WEAPON_CHAINSAW, DMG_BLUNT);
-			Weapons_PlaySound(pl, CHAN_WEAPON, "sh/chainsaw_cutintoflesh.wav", 1, ATTN_NORM);
+			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.hitflesh");
 		} else {
 			FX_Spark(trace_endpos, trace_plane_normal);
-			Weapons_PlaySound(pl, CHAN_WEAPON, "sh/chainsaw_cutinto.wav", 1, ATTN_NORM);
+			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.hit");
 		}
 		pl.w_attack_next = 0.1f;
 	}
@@ -124,14 +130,29 @@ void w_chainsaw_release(void)
 		Weapons_ViewAnimation(CHAINSAW_STOPFIRE);
 		return;
 	} else {
+	
 		pl.w_idle_next = 10.0f;
 	}
 
+	/* TODO make these play right */
 	if (random() < 0.5) {
 		Weapons_ViewAnimation(CHAINSAW_IDLE1);
 	} else {
 		Weapons_ViewAnimation(CHAINSAW_IDLE2);
 	}
+
+	if (pl.w_idle_next > 0.0f) {
+		/* Loop idle sound */
+		if (pl.ammo_chainsaw_state == 0) {
+#ifdef SERVER
+			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.idle");
+#endif
+		}
+		pl.w_idle_next = 1.5f;
+	}
+
+	pl.w_attack_next = 0.2f;
+
 }
 
 float w_chainsaw_aimanim(void)

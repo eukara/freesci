@@ -34,11 +34,9 @@ enum
 void w_hammer_precache(void)
 {
 #ifdef SERVER
-	precache_sound("sh/ham_hitbod1.wav");
-	precache_sound("sh/ham_hitbod2.wav");
-	precache_sound("sh/ham_hitbod3.wav");
-	precache_sound("sh/ham_hitw.wav");
-	precache_sound("sh/ham_swing.wav");
+	Sound_Precache("weapon_hammer.hit");
+	Sound_Precache("weapon_hammer.hitflesh");
+	Sound_Precache("weapon_hammer.miss");
 #else
 	precache_model("models/p_hammer.mdl");
 	precache_model("models/v_hammer.mdl");
@@ -120,7 +118,10 @@ void w_hammer_release(void)
 	if (pl.ammo_hammer_state == 1) {
 	#ifdef SERVER
 		if (trace_ent.takedamage) {
-			hitsound = floor(random(1, 4));
+			if (trace_ent.iBleeds) {
+				FX_Blood(trace_endpos, [1,0,0]);
+			}
+			hitsound = floor(random(1, 2));
 
 			/* players only take half damage */
 			if (trace_ent.classname == "player")
@@ -138,7 +139,7 @@ void w_hammer_release(void)
 			}
 		} else {
 			if (trace_fraction < 1.0) {
-				hitsound = 4;
+				hitsound = 2;
 			}
 		}
 	#endif
@@ -147,12 +148,15 @@ void w_hammer_release(void)
 	} else if (pl.ammo_hammer_state == 2) {
 #ifdef SERVER
 	if (trace_ent.takedamage) {
-		hitsound = floor(random(1, 4));
+		if (trace_ent.iBleeds) {
+			FX_Blood(trace_endpos, [1,0,0]);
+		}
+		hitsound = floor(random(1, 2));
 		hdmg = Skill_GetValue("plr_hammeralt", 200);
 		Damage_Apply(trace_ent, self, hdmg, WEAPON_HAMMER, DMG_BLUNT);
 	} else {
 		if (trace_fraction < 1.0) {
-			hitsound = 4;
+			hitsound = 2;
 		}   
 	}
 #endif
@@ -162,22 +166,16 @@ void w_hammer_release(void)
 
 #ifdef SERVER
 	if (pl.ammo_hammer_state > 0) {
-		string snd = "sh/ham_swing.wav";
+		string snd = "weapon_hammer.miss";
 		switch (hitsound) {
 		case 1:
-			snd = "sh/ham_hitbod1.wav";
+			snd = "weapon_hammer.hitflesh";
 			break;
 		case 2:
-			snd = "sh/ham_hitbod2.wav";
-			break;
-		case 3:
-			snd = "sh/ham_hitbod3.wav";
-			break;
-		case 4:
-			snd = "sh/ham_hitw.wav";
+			snd = "weapon_hammer.hit";
 			break;
 		}
-		Weapons_PlaySound(pl, CHAN_WEAPON, snd, 1.0f, ATTN_NORM);
+		Sound_Play(pl, CHAN_WEAPON, snd);
 	}
 #endif
 

@@ -34,11 +34,7 @@ void
 w_cannon_precache(void)
 {
 #ifdef SERVER
-	precache_sound("cannon/cin.wav");
-	precache_sound("cannon/close.wav");
-	precache_sound("cannon/cout.wav");
-	precache_sound("cannon/fire.wav");
-	precache_sound("cannon/open.wav");
+	Sound_Precache("weapon_cannon.shoot");
 #else
 	precache_model("models/v_cannon.mdl");
 	precache_model("models/p_cannon.mdl");
@@ -141,7 +137,7 @@ w_cannon_primary(void)
 	dmg = Skill_GetValue("plr_cannon", 5);
 	TraceAttack_FireBullets(20, pl.origin + pl.view_ofs, dmg, [0.08716,0.04362], WEAPON_CANNON);
 	pl.cannon_mag -= 2;
-	Weapons_PlaySound(pl, CHAN_WEAPON, "cannon/fire.wav", 1, ATTN_NORM);
+	Sound_Play(pl, CHAN_WEAPON, "weapon_cannon.shoot");
 	Weapons_UpdateAmmo(pl, pl.cannon_mag, pl.ammo_buckshot, __NULL__);
 #endif
 	Weapons_ViewPunchAngle([-5,0,0]);
@@ -171,7 +167,7 @@ w_cannon_secondary(void)
 	dmg = Skill_GetValue("plr_cannon", 5);
 	TraceAttack_FireBullets(10, pl.origin + pl.view_ofs, dmg, [0.08716,0.04362], WEAPON_CANNON);
 	pl.cannon_mag--;
-	Weapons_PlaySound(pl, CHAN_WEAPON, "cannon/fire.wav", 1, ATTN_NORM);
+	Sound_Play(pl, CHAN_WEAPON, "weapon_cannon.shoot");
 #endif
 
 	if (pl.cannon_mag == 2) {

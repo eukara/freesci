@@ -1,0 +1,51 @@
+weapon_cannon.shoot
+{
+	sample cannon/fire.wav
+}
+
+weapon_chainsaw.attack
+{
+	sample sh/chainsaw_idle2.wav
+}
+
+weapon_chainsaw.draw
+{
+	sample sh/chainsaw_pullout.wav
+}
+
+weapon_chainsaw.hit
+{
+	sample sh/chainsaw_cutinto.wav
+}
+
+weapon_chainsaw.hitflesh
+{
+	sample sh/chainsaw_cutintoflesh.wav
+}
+
+weapon_chainsaw.idle
+{
+	sample sh/chainsaw_idle.wav
+}
+
+weapon_chainsaw.startup
+{
+	sample sh/chainsaw_startup.wav
+}
+
+weapon_hammer.hit
+{
+	sample sh/ham_hitw.wav
+}
+
+weapon_hammer.hitflesh
+{
+	sample sh/ham_hitbod1.wav
+	sample sh/ham_hitbod2.wav
+	sample sh/ham_hitbod3.wav
+}
+
+weapon_hammer.miss
+{
+	sample sh/ham_swing.wav
+}
