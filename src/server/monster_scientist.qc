@@ -257,6 +257,8 @@ monster_scientist::Respawn(void)
 	CBaseNPC::Respawn();
 	m_iFlags |= MONSTER_CANFOLLOW;
 	PlayerUse = OnPlayerUse;
+	health = base_health = Skill_GetValue("scientist_health", 20);
+	takedamage = DAMAGE_YES;
 
 	if (autocvar_sh_scialert) {
 		m_iFlags |= MONSTER_FEAR;
@@ -307,9 +309,9 @@ monster_scientist::monster_scientist(void)
 	model = "models/scientist.mdl";
 	base_mins = [-16,-16,0];
 	base_maxs = [16,16,72];
+	base_health = Skill_GetValue("scientist_health", 20);
 	CBaseNPC::CBaseNPC();
 	precache_model(m_oldModel);
-	base_health = Skill_GetValue("scientist_health", 20);
 
 	if (m_iBody == -1) {
 		/* This stuff needs to be persistent because we can't guarantee that
