@@ -29,6 +29,12 @@ enum
 	CHAINSAW_IDLE2,
 };
 
+enum
+{
+	CHAINSAWSTATE_IDLE,
+	CHAINSAWSTATE_ATTACKING,
+};
+
 void w_chainsaw_precache(void)
 {
 #ifdef SERVER
@@ -76,12 +82,13 @@ void w_chainsaw_holster(void)
 void w_chainsaw_primary(void)
 {
 	player pl = (player)self;
-	
-	if (pl.w_attack_next) {
-		return;
-	}
 
-	pl.ammo_chainsaw_state = 1;
+	/* only do it in the attack state */
+	if (pl.ammo_chainsaw_state == CHAINSAWSTATE_ATTACKING)
+		if (pl.w_attack_next)
+			return;
+
+	pl.ammo_chainsaw_state = CHAINSAWSTATE_ATTACKING;
 	Weapons_ViewAnimation(CHAINSAW_CONTINUEFIRE);
 
 #ifdef SERVER
@@ -120,39 +127,35 @@ void w_chainsaw_release(void)
 {
 	player pl = (player)self;
 
-	if (pl.w_idle_next) {
+	if (pl.w_idle_next)
 		return;
-	}
 
-	if (pl.ammo_chainsaw_state == 1) {
-		pl.ammo_chainsaw_state = 0;
-		pl.w_idle_next = 1.0f;
+	if (pl.ammo_chainsaw_state == CHAINSAWSTATE_ATTACKING) {
+		pl.ammo_chainsaw_state = CHAINSAWSTATE_IDLE;
 		Weapons_ViewAnimation(CHAINSAW_STOPFIRE);
-		return;
-	} else {
-	
-		pl.w_idle_next = 10.0f;
-	}
-
-	/* TODO make these play right */
-	if (random() < 0.5) {
-		Weapons_ViewAnimation(CHAINSAW_IDLE1);
-	} else {
-		Weapons_ViewAnimation(CHAINSAW_IDLE2);
-	}
-
-	if (pl.w_idle_next > 0.0f) {
-		/* Loop idle sound */
-		if (pl.ammo_chainsaw_state == 0) {
 #ifdef SERVER
 			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.idle");
 #endif
-		}
-		pl.w_idle_next = 1.5f;
+		return;
 	}
 
-	pl.w_attack_next = 0.2f;
-
+	if (pl.ammo_chainsaw_state == CHAINSAWSTATE_IDLE) {
+		if (pl.w_idle_next <= 0.0f) {
+			/* Loop idle sound */
+#ifdef SERVER
+			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.idle");
+#endif
+			pl.w_idle_next = 1.45f;
+		}
+		if (pl.w_attack_next <= 0.0f) {
+			if (random() < 0.5) {
+				Weapons_ViewAnimation(CHAINSAW_IDLE1);
+			} else {
+				Weapons_ViewAnimation(CHAINSAW_IDLE2);
+			}
+			pl.w_attack_next = 5.3333f;
+		}
+	}
 }
 
 float w_chainsaw_aimanim(void)
