@@ -144,6 +144,11 @@ w_cannon_primary(void)
 	Weapons_ViewAnimation(CANNON_FIREBOTH);
 	pl.w_attack_next = 1.5f;
 	pl.w_idle_next = 2.5f;
+
+	if (self.flags & FL_CROUCHING)
+		Animation_PlayerTop(pl, ANIM_CR_SHOOTSHOTGUN, 0.41f);
+	else
+		Animation_PlayerTop(pl, ANIM_SHOOTSHOTGUN, 0.5f);
 }
 
 void
@@ -178,6 +183,11 @@ w_cannon_secondary(void)
 
 	pl.w_attack_next = 1.5f;
 	pl.w_idle_next = 2.5f;
+
+	if (self.flags & FL_CROUCHING)
+		Animation_PlayerTop(pl, ANIM_CR_SHOOTSHOTGUN, 0.41f);
+	else
+		Animation_PlayerTop(pl, ANIM_SHOOTSHOTGUN, 0.5f);
 }
 void
 w_cannon_release(void)

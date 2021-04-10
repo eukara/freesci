@@ -160,7 +160,7 @@ void w_chainsaw_release(void)
 
 float w_chainsaw_aimanim(void)
 {
-	return self.flags & FL_CROUCHING ? ANIM_CR_AIMSQUEAK : ANIM_AIMSQUEAK;
+	return self.flags & FL_CROUCHING ? ANIM_CR_AIMEGON : ANIM_AIMEGON;
 }
 
 void w_chainsaw_hudpic(int s, vector pos, float a)

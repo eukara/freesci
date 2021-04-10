@@ -145,23 +145,33 @@ void w_hammer_release(void)
 	#endif
 		Weapons_ViewAnimation(HAMMER_ATTACK1);
 		pl.w_attack_next = 1.0f;
+
+		if (self.flags & FL_CROUCHING)
+			Animation_PlayerTop(pl, ANIM_CR_SHOOTCROWBAR, 0.41f);
+		else
+			Animation_PlayerTop(pl, ANIM_SHOOTCROWBAR, 0.5f);
 	} else if (pl.ammo_hammer_state == 2) {
 #ifdef SERVER
-	if (trace_ent.takedamage) {
-		if (trace_ent.iBleeds) {
-			FX_Blood(trace_endpos, [1,0,0]);
+		if (trace_ent.takedamage) {
+			if (trace_ent.iBleeds) {
+				FX_Blood(trace_endpos, [1,0,0]);
+			}
+			hitsound = floor(random(1, 2));
+			hdmg = Skill_GetValue("plr_hammeralt", 200);
+			Damage_Apply(trace_ent, self, hdmg, WEAPON_HAMMER, DMG_BLUNT);
+		} else {
+			if (trace_fraction < 1.0) {
+				hitsound = 2;
+			}   
 		}
-		hitsound = floor(random(1, 2));
-		hdmg = Skill_GetValue("plr_hammeralt", 200);
-		Damage_Apply(trace_ent, self, hdmg, WEAPON_HAMMER, DMG_BLUNT);
-	} else {
-		if (trace_fraction < 1.0) {
-			hitsound = 2;
-		}   
-	}
 #endif
 		Weapons_ViewAnimation(HAMMER_ATTACK2);
 		pl.w_attack_next = 0.75f;
+
+		if (self.flags & FL_CROUCHING)
+			Animation_PlayerTop(pl, ANIM_CR_SHOOTCROWBAR, 0.41f);
+		else
+			Animation_PlayerTop(pl, ANIM_SHOOTCROWBAR, 0.5f);
 	}
 
 #ifdef SERVER
