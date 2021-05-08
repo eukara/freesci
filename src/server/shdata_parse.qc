@@ -20,7 +20,8 @@ var int autocvar_sh_sciyaw = TRUE;
 /* Limit the amount of scientists spawned */
 var int autocvar_sh_scimax = 30;
 
-void SHData_SpawnScientist(void)
+void
+SHData_SpawnScientist(void)
 {
 	static int slimit = 0;
 	if (autocvar_sh_scimax) {
@@ -34,7 +35,8 @@ void SHData_SpawnScientist(void)
 	spawnfunc_monster_scientist();
 }
 
-void SHData_New(void)
+void
+SHData_New(void)
 {
 	entity new = spawn();
 	new.origin[0] = stof(argv(1));
@@ -60,7 +62,8 @@ void SHData_New(void)
 	self = oldself;
 }
 
-void SHData_NewAngles(void)
+void
+SHData_NewAngles(void)
 {
 	entity new = spawn();
 	new.origin[0] = stof(argv(1));
@@ -84,7 +87,8 @@ void SHData_NewAngles(void)
 	self = oldself;
 }
 
-void SHData_GetItems(player pl)
+void
+SHData_GetItems(player pl)
 {
 	/* TODO: Parse the config files */
 	pl.ammo_9mm = 68;
@@ -113,7 +117,8 @@ void SHData_GetItems(player pl)
 	Weapons_AddItem(pl, WEAPON_HAMMER, -1);
 }
 
-void SHData_Parse(string map)
+void
+SHData_Parse(string map)
 {
 	int c;
 	string temp;

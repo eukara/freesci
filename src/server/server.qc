@@ -20,7 +20,8 @@ Game_InitRules(void)
 	g_grMode = spawn(SHMultiplayerRules);
 }
 
-void Game_Worldspawn(void)
+void
+Game_Worldspawn(void)
 {
 	precache_model("models/player.mdl");
 	precache_model("models/w_weaponbox.mdl");
