@@ -394,11 +394,11 @@ float
 player::SendEntity(entity ePEnt, float fChanged)
 {
 	if (health <= 0 && ePEnt != this) {
-		return FALSE;
+		return (0);
 	}
 
 	if (clienttype(ePEnt) != CLIENTTYPE_REAL) {
-		return FALSE;
+		return (0);
 	}
 
 	if (ePEnt != self) {
@@ -463,6 +463,6 @@ player::SendEntity(entity ePEnt, float fChanged)
 		WriteByte(MSG_ENTITY, ammo_hammer_state);
 	}
 
-	return TRUE;
+	return (1);
 }
 #endif

@@ -101,7 +101,7 @@ monster_scientist::AttackMelee(void)
 	/* functional */
 	think = AttackNeedle;
 	nextthink = 0.25f;
-	return TRUE;
+	return (1);
 }
 
 void
