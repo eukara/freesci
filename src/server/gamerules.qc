@@ -75,6 +75,7 @@ SHMultiplayerRules::PlayerDeath(base_player pl)
 	corpse.frame = ANIM_DIESIMPLE;
 	corpse.angles = pl.angles;
 	corpse.velocity = pl.velocity;
+	corpse.colormap = pl.colormap;
 }
 
 void
