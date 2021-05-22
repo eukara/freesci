@@ -21,6 +21,7 @@
 
 ../../../base/src/client/draw.qc
 ../../../valve/src/client/init.qc
+../../../valve/src/client/flashlight.qc
 ../../../valve/src/client/player.qc
 ../../../valve/src/client/entities.qc
 ../../../valve/src/client/cmds.qc
