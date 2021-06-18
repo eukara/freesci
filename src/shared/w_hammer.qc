@@ -124,10 +124,7 @@ void w_hammer_release(void)
 			hitsound = floor(random(1, 2));
 
 			/* players only take half damage */
-			if (trace_ent.classname == "player")
-				hdmg = Skill_GetValue("plr_hammer", 100) / 2;
-			else
-				hdmg = Skill_GetValue("plr_hammer", 100);
+			hdmg = Skill_GetValue("plr_hammer", 50);
 
 			Damage_Apply(trace_ent, self, hdmg, WEAPON_HAMMER, DMG_BLUNT);
 
