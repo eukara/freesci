@@ -222,7 +222,7 @@ monster_scientist::Pain(void)
 void
 monster_scientist::Death(void)
 {
-	WarnAllies();
+	StartleAllies();
 
 	if (style != MONSTER_DEAD) {
 		SHMultiplayerRules rules = (SHMultiplayerRules)g_grMode;
