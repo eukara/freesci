@@ -18,6 +18,8 @@
 
 class SHMultiplayerRules:CGameRules
 {
+	float m_flRestockTimer;
+
 	/* client */
 	virtual void(base_player) PlayerSpawn;
 	virtual void(base_player) PlayerConnect;
@@ -30,4 +32,7 @@ class SHMultiplayerRules:CGameRules
 	virtual void(base_player) LevelDecodeParms;
 	virtual void(base_player) LevelChangeParms;
 	virtual void(void) LevelNewParms;
+	virtual void(void) FrameStart;
+
+	void(void) SHMultiplayerRules;
 };

@@ -304,4 +304,23 @@ SHMultiplayerRules::ScientistKill(base_player pp, entity sci)
 
 	/* timer gets touched every time */
 	pl.sh_insanetime = time + 2.0f;
-} 
+}
+
+void
+SHMultiplayerRules::FrameStart(void)
+{
+	if (m_flRestockTimer < time) {
+		m_flRestockTimer = time + 120.0f;
+		
+		for ( entity e = world; ( e = find( e, ::classname, "player" ) ); ) {
+			player pl = (player)e;
+			SHData_GetItems(pl);
+		}
+	}
+}
+
+void
+SHMultiplayerRules::SHMultiplayerRules(void)
+{
+	CGameRules::CGameRules();
+}
