@@ -332,6 +332,10 @@ SHMultiplayerRules::FrameStart(void)
 			func_pushable pb = (func_pushable)e;
 			pb.Respawn();
 		}
+		for (e = world; (e = find( e, ::classname, "env_shooter"));) {
+			env_shooter sh = (env_shooter)e;
+			sh.Respawn();
+		}
 	}
 }
 
