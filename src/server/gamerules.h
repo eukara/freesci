@@ -19,6 +19,7 @@
 class SHMultiplayerRules:CGameRules
 {
 	float m_flRestockTimer;
+	float m_flBreakRespawnTimer;
 
 	/* client */
 	virtual void(base_player) PlayerSpawn;

@@ -309,12 +309,28 @@ SHMultiplayerRules::ScientistKill(base_player pp, entity sci)
 void
 SHMultiplayerRules::FrameStart(void)
 {
+	entity e;
+
 	if (m_flRestockTimer < time) {
 		m_flRestockTimer = time + 120.0f;
 		
-		for ( entity e = world; ( e = find( e, ::classname, "player" ) ); ) {
+		for (e = world; (e = find(e, ::classname, "player"));) {
 			player pl = (player)e;
 			SHData_GetItems(pl);
+		}
+	}
+
+	if (autocvar(sh_respbreak, 1))
+	if (m_flBreakRespawnTimer < time) {
+		m_flBreakRespawnTimer = time + 120.0f;
+		
+		for (e = world; (e = find( e, ::classname, "func_breakable"));) {
+			func_breakable br = (func_breakable)e;
+			br.Respawn();
+		}
+		for (e = world; (e = find( e, ::classname, "func_pushable"));) {
+			func_pushable pb = (func_pushable)e;
+			pb.Respawn();
 		}
 	}
 }
