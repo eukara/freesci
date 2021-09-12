@@ -74,9 +74,9 @@ w_cannon_reload(void)
 		return;
 	}
 
-#ifdef CLIENT
 	Weapons_ViewAnimation(CANNON_RELOAD);
-#else
+
+#ifdef SERVER
 	Weapons_ReloadWeapon(pl, player::cannon_mag, player::ammo_buckshot, 2);
 #endif
 
@@ -165,9 +165,9 @@ w_cannon_secondary(void)
 		return;
 	}
 
-#ifdef CLIENT
 	Weapons_ViewPunchAngle([-5,0,0]);
-#else
+
+#ifdef SERVER
 	int dmg;
 	dmg = Skill_GetValue("plr_cannon", 5);
 	TraceAttack_FireBullets(10, pl.origin + pl.view_ofs, dmg, [0.08716,0.04362], WEAPON_CANNON);
