@@ -80,7 +80,16 @@ class monster_scientist:CBaseNPC
 
 	virtual int(void) AttackMelee;
 	virtual void(void) AttackNeedle;
+
+	virtual void(void) FallNoise;
 };
+
+void
+monster_scientist::FallNoise(void)
+{
+	float r = floor(random(3,8)) + 1.0f;
+	sound(this, CHAN_VOICE, sprintf("scientist/scream%02d.wav", r), 1.0, ATTN_NORM);
+}
 
 int
 monster_scientist::AttackMelee(void)
@@ -270,6 +279,12 @@ void
 monster_scientist::monster_scientist(void)
 {
 	spawnflags |= MSF_MULTIPLAYER;
+
+	precache_sound("scientist/scream04.wav");
+	precache_sound("scientist/scream05.wav");
+	precache_sound("scientist/scream06.wav");
+	precache_sound("scientist/scream07.wav");
+	precache_sound("scientist/scream08.wav");
 
 	Sound_Precache("monster_scientist.die");
 	Sound_Precache("monster_scientist.pain");
