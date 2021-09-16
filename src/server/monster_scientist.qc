@@ -312,7 +312,7 @@ monster_scientist::monster_scientist(void)
 	base_maxs = [16,16,72];
 	base_health = Skill_GetValue("scientist_health", 20);
 	CBaseNPC::CBaseNPC();
-	precache_model(m_oldModel);
+	precache_model(GetSpawnModel());
 
 	if (m_iBody == -1) {
 		/* This stuff needs to be persistent because we can't guarantee that
