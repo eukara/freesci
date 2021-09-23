@@ -49,3 +49,6 @@
 #define ITEM_UNUSED30		0x20000000
 #define ITEM_UNUSED31		0x40000000
 #define ITEM_UNUSED32		0x80000000
+
+/* part of .gflags */
+#define GF_MADNESS		(1<<23) 

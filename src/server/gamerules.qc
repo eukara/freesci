@@ -230,12 +230,12 @@ SHMultiplayerRules::PlayerPostFrame(base_player pp)
 	pl.sh_insaneactive = bound(0.0f, pl.sh_insaneactive - frametime, pl.sh_insaneactive);
 
 	if (pl.sh_insaneactive > 0.0f)
-		pl.flags |= FL_RESERVED1;
+		pl.gflags |= GF_MADNESS;
 	else {
-		if (pl.flags & FL_RESERVED1) {
+		if (pl.gflags & GF_MADNESS) {
 			bprint(PRINT_CHAT, sprintf("%s is no longer insane!\n", pl.netname));
 		}
-		pl.flags &= ~FL_RESERVED1;
+		pl.gflags &= ~GF_MADNESS;
 	}
 }
 

@@ -14,6 +14,10 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+
+/* part of .gflags */
+#define GF_MADNESS		(1<<23) 
+
 #define PHY_JUMP_CHAINWINDOW	0.5
 #define PHY_JUMP_CHAIN			100
 #define PHY_JUMP_CHAINDECAY		50
@@ -24,7 +28,7 @@
 float
 GamePMove_Maxspeed(player target)
 {
-	if (target.flags & FL_RESERVED1)
+	if (target.gflags & GF_MADNESS)
 		return (target.flags & FL_CROUCHING) ? 135 : 500;
 	else
 		return (target.flags & FL_CROUCHING) ? 135 : 270;
