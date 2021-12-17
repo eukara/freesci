@@ -107,6 +107,7 @@ class player:base_player
 
 #ifdef CLIENT
 void Weapons_AmmoUpdate(entity);
+void HUD_AmmoNotify_Check(player);
 /*
 =================
 player::ReceiveEntity
@@ -165,8 +166,10 @@ player::ReceiveEntity(float new, float fl)
 		ammo_hammer_state = readbyte();
 	}
 
-	if (fl & PLAYER_AMMO1 || fl & PLAYER_AMMO2 || fl & PLAYER_AMMO3)
+	if (fl & PLAYER_AMMO1 || fl & PLAYER_AMMO2 || fl & PLAYER_AMMO3) {
 		Weapons_AmmoUpdate(this);
+		HUD_AmmoNotify_Check(this);
+	}
 
 	setorigin(this, origin);
 }
