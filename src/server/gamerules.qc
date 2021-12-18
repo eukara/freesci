@@ -56,26 +56,12 @@ SHMultiplayerRules::PlayerDeath(base_player pl)
 	pl.nextthink = time + 4.0f;
 	Sound_Play(pl, CHAN_AUTO, "player.die");
 
+	/* either gib, or make a corpse */
 	if (pl.health < -50) {
-		pl.health = 0;
 		FX_GibHuman(pl.origin);
-		return;
+	} else {
+		FX_Corpse_Spawn(pl, ANIM_DIESIMPLE);
 	}
-
-	pl.health = 0;
-
-	/* Let's handle corpses on the clientside */
-	entity corpse = spawn();
-	setorigin(corpse, pl.origin + [0,0,32]);
-	setmodel(corpse, pl.model);
-	setsize(corpse, VEC_HULL_MIN, VEC_HULL_MAX);
-	corpse.movetype = MOVETYPE_TOSS;
-	corpse.solid = SOLID_TRIGGER;
-	corpse.modelindex = pl.modelindex;
-	corpse.frame = ANIM_DIESIMPLE;
-	corpse.angles = pl.angles;
-	corpse.velocity = pl.velocity;
-	corpse.colormap = pl.colormap;
 }
 
 void

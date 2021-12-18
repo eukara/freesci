@@ -32,4 +32,5 @@ Game_Worldspawn(void)
 	Player_Precache();
 	Weapons_Init();
 	SHData_Parse(mapname);
+	FX_Corpse_Init();
 }
