@@ -49,7 +49,7 @@ w_cannon_updateammo(player pl)
 }
 
 string
-w_cannon_pmodel(void)
+w_cannon_pmodel(player pl)
 {
 	return "models/p_cannon.mdl";
 }
@@ -61,9 +61,8 @@ w_cannon_deathmsg(void)
 }
 
 void
-w_cannon_reload(void)
+w_cannon_reload(player pl)
 {
-	player pl = (player)self;
 	if (pl.w_attack_next > 0) {
 		return;
 	}
@@ -74,7 +73,7 @@ w_cannon_reload(void)
 		return;
 	}
 
-	Weapons_ViewAnimation(CANNON_RELOAD);
+	Weapons_ViewAnimation(pl, CANNON_RELOAD);
 
 #ifdef SERVER
 	Weapons_ReloadWeapon(pl, player::cannon_mag, player::ammo_buckshot, 2);
@@ -85,10 +84,9 @@ w_cannon_reload(void)
 }
 
 int
-w_cannon_pickup(int new, int startammo)
+w_cannon_pickup(player pl, int new, int startammo)
 {
 #ifdef SERVER
-	player pl = (player)self;
 
 	if (new) {
 		pl.cannon_mag = 2;
@@ -104,29 +102,28 @@ w_cannon_pickup(int new, int startammo)
 }
 
 void
-w_cannon_draw(void)
+w_cannon_draw(player pl)
 {
 	Weapons_SetModel("models/v_cannon.mdl");
-	Weapons_ViewAnimation(CANNON_DEPLOY);
+	Weapons_ViewAnimation(pl, CANNON_DEPLOY);
 }
 
 void
-w_cannon_holster(void)
+w_cannon_holster(player pl)
 {
-	Weapons_ViewAnimation(CANNON_PUTAWAY);
+	Weapons_ViewAnimation(pl, CANNON_PUTAWAY);
 }
 
 void
-w_cannon_primary(void)
+w_cannon_primary(player pl)
 {
-	player pl = (player)self;
 
 	if (pl.w_attack_next > 0.0) {
 		return;
 	}
 
 	if (pl.cannon_mag != 2) {
-		w_cannon_reload();
+		w_cannon_reload(pl);
 		return;
 	}
 
@@ -140,8 +137,8 @@ w_cannon_primary(void)
 	Sound_Play(pl, CHAN_WEAPON, "weapon_cannon.shoot");
 	Weapons_UpdateAmmo(pl, pl.cannon_mag, pl.ammo_buckshot, __NULL__);
 #endif
-	Weapons_ViewPunchAngle([-5,0,0]);
-	Weapons_ViewAnimation(CANNON_FIREBOTH);
+	Weapons_ViewPunchAngle(pl, [-5,0,0]);
+	Weapons_ViewAnimation(pl, CANNON_FIREBOTH);
 	pl.w_attack_next = 1.5f;
 	pl.w_idle_next = 2.5f;
 
@@ -152,20 +149,19 @@ w_cannon_primary(void)
 }
 
 void
-w_cannon_secondary(void)
+w_cannon_secondary(player pl)
 {
-	player pl = (player)self;
 
 	if (pl.w_attack_next > 0.0) {
 		return;
 	}
 
 	if (!pl.cannon_mag) {
-		w_cannon_reload();
+		w_cannon_reload(pl);
 		return;
 	}
 
-	Weapons_ViewPunchAngle([-5,0,0]);
+	Weapons_ViewPunchAngle(pl, [-5,0,0]);
 
 #ifdef SERVER
 	int dmg;
@@ -176,9 +172,9 @@ w_cannon_secondary(void)
 #endif
 
 	if (pl.cannon_mag == 2) {
-		Weapons_ViewAnimation(CANNON_FIRELEFT);
+		Weapons_ViewAnimation(pl, CANNON_FIRELEFT);
 	} else {
-		Weapons_ViewAnimation(CANNON_FIRERIGHT);
+		Weapons_ViewAnimation(pl, CANNON_FIRERIGHT);
 	}
 
 	pl.w_attack_next = 1.5f;
@@ -190,14 +186,13 @@ w_cannon_secondary(void)
 		Animation_PlayerTop(pl, ANIM_SHOOTSHOTGUN, 0.5f);
 }
 void
-w_cannon_release(void)
+w_cannon_release(player pl)
 {
-	player pl = (player)self;
 
 	/* auto-reload if need be */
 	if (pl.w_attack_next <= 0.0)
 	if (pl.cannon_mag == 0 && pl.ammo_buckshot > 0) {
-		Weapons_Reload();
+		Weapons_Reload(pl);
 		return;
 	}
 
@@ -208,10 +203,10 @@ w_cannon_release(void)
 	int r = floor(random(0,2));
 	switch (r) {
 	case 0:
-		Weapons_ViewAnimation(CANNON_IDLE1);
+		Weapons_ViewAnimation(pl, CANNON_IDLE1);
 		break;
 	case 1:
-		Weapons_ViewAnimation(CANNON_IDLE2);
+		Weapons_ViewAnimation(pl, CANNON_IDLE2);
 		break;
 	}
 
@@ -219,7 +214,7 @@ w_cannon_release(void)
 }
 
 void
-w_cannon_crosshair(void)
+w_cannon_crosshair(player pl)
 {
 #ifdef CLIENT
 	static vector cross_pos;
@@ -233,16 +228,15 @@ w_cannon_crosshair(void)
 }
 
 float
-w_cannon_aimanim(void)
+w_cannon_aimanim(player pl)
 {
-	return self.flags & FL_CROUCHING ? ANIM_CR_AIMSHOTGUN : ANIM_AIMSHOTGUN;
+	return pl.flags & FL_CROUCHING ? ANIM_CR_AIMSHOTGUN : ANIM_AIMSHOTGUN;
 }
 
 void
-w_cannon_hudpic(int s, vector pos, float a)
+w_cannon_hudpic(player pl, int s, vector pos, float a)
 {
 #ifdef CLIENT
-	player pl = (player)self;
 	vector hud_col;
 
 	if (pl.cannon_mag == 0 && pl.ammo_buckshot == 0)
@@ -264,7 +258,7 @@ weapon_t
 w_cannon =
 {
 	.name		= "handcannon",
-	.id		= ITEM_CANNON,
+	.id			= ITEM_CANNON,
 	.slot		= 2,
 	.slot_pos	= 3,
 	.draw		= w_cannon_draw,
@@ -273,7 +267,7 @@ w_cannon =
 	.secondary	= w_cannon_secondary,
 	.reload		= w_cannon_reload,
 	.release	= w_cannon_release,
-	.crosshair	= w_cannon_crosshair,
+	.postdraw	= w_cannon_crosshair,
 	.precache	= w_cannon_precache,
 	.pickup		= w_cannon_pickup,
 	.updateammo	= w_cannon_updateammo,

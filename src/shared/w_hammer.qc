@@ -48,7 +48,7 @@ void w_hammer_updateammo(player pl)
 {
 	Weapons_UpdateAmmo(pl, -1, -1, -1);
 }
-string w_hammer_pmodel(void)
+string w_hammer_pmodel(player pl)
 {
 	return "models/p_hammer.mdl";
 }
@@ -57,51 +57,48 @@ string w_hammer_deathmsg(void)
 	return "%s killed %s with hammer.";
 }
 
-void w_hammer_draw(void)
+void w_hammer_draw(player pl)
 {
 	Weapons_SetModel("models/v_hammer.mdl");
-	Weapons_ViewAnimation(HAMMER_DRAW);
+	Weapons_ViewAnimation(pl, HAMMER_DRAW);
 }
 
-void w_hammer_holster(void)
+void w_hammer_holster(player pl)
 {
-	Weapons_ViewAnimation(HAMMER_HOLSTER);
+	Weapons_ViewAnimation(pl, HAMMER_HOLSTER);
 }
-void w_hammer_primary(void)
+void w_hammer_primary(player pl)
 {
-	player pl = (player)self;
 
 	if (!pl.w_attack_next) {
 		/* Hack */
 		if (pl.ammo_hammer_state != 1) {
-			Weapons_ViewAnimation(HAMMER_HOLSTER2);
+			Weapons_ViewAnimation(pl, HAMMER_HOLSTER2);
 			pl.ammo_hammer_state = 1;
 			pl.w_attack_next = 0.5f;
 		}
 	}
 	pl.w_idle_next = 2.5f;
 }
-void w_hammer_secondary(void)
+void w_hammer_secondary(player pl)
 {
-	player pl = (player)self;
 
 	if (!pl.w_attack_next) {
 		/* Hack */
 		if (pl.ammo_hammer_state != 2) {
-			Weapons_ViewAnimation(HAMMER_HOLSTER3);
+			Weapons_ViewAnimation(pl, HAMMER_HOLSTER3);
 			pl.ammo_hammer_state = 2;
 			pl.w_attack_next = 0.5f;
 		}
 	}
 	pl.w_idle_next = 2.5f;
 }
-void w_hammer_reload(void)
+void w_hammer_reload(player pl)
 {
 	
 }
-void w_hammer_release(void)
+void w_hammer_release(player pl)
 {
-	player pl = (player)self;
 
 	if (pl.w_attack_next) {
 		return;
@@ -140,7 +137,7 @@ void w_hammer_release(void)
 			}
 		}
 	#endif
-		Weapons_ViewAnimation(HAMMER_ATTACK1);
+		Weapons_ViewAnimation(pl, HAMMER_ATTACK1);
 		pl.w_attack_next = 1.0f;
 
 		if (self.flags & FL_CROUCHING)
@@ -162,7 +159,7 @@ void w_hammer_release(void)
 			}   
 		}
 #endif
-		Weapons_ViewAnimation(HAMMER_ATTACK2);
+		Weapons_ViewAnimation(pl, HAMMER_ATTACK2);
 		pl.w_attack_next = 0.75f;
 
 		if (self.flags & FL_CROUCHING)
@@ -197,24 +194,24 @@ void w_hammer_release(void)
 	int r = floor(random(0,3));
 	switch (r) {
 	case 0:
-		Weapons_ViewAnimation(HAMMER_IDLE1);
+		Weapons_ViewAnimation(pl, HAMMER_IDLE1);
 		break;
 	case 1:
-		Weapons_ViewAnimation(HAMMER_IDLE2);
+		Weapons_ViewAnimation(pl, HAMMER_IDLE2);
 		break;
 	case 2:
-		Weapons_ViewAnimation(HAMMER_IDLE3);
+		Weapons_ViewAnimation(pl, HAMMER_IDLE3);
 		break;
 	}
 	pl.w_idle_next = 10.0f;
 }
 
-float w_hammer_aimanim(void)
+float w_hammer_aimanim(player pl)
 {
-	return self.flags & FL_CROUCHING ? ANIM_CR_AIMCROWBAR : ANIM_AIMCROWBAR;
+	return pl.flags & FL_CROUCHING ? ANIM_CR_AIMCROWBAR : ANIM_AIMCROWBAR;
 }
 
-void w_hammer_hudpic(int s, vector pos, float a)
+void w_hammer_hudpic(player pl, int s, vector pos, float a)
 {
 #ifdef CLIENT
 	if (s) {
@@ -228,7 +225,7 @@ void w_hammer_hudpic(int s, vector pos, float a)
 weapon_t w_hammer =
 {
 	.name		= "hammer",
-	.id		= ITEM_HAMMER,
+	.id			= ITEM_HAMMER,
 	.slot		= 0,
 	.slot_pos	= 1,
 	.draw		= w_hammer_draw,
@@ -237,7 +234,7 @@ weapon_t w_hammer =
 	.secondary	= w_hammer_secondary,
 	.reload		= w_hammer_reload,
 	.release	= w_hammer_release,
-	.crosshair	= __NULL__,
+	.postdraw	= __NULL__,
 	.precache	= w_hammer_precache,
 	.pickup		= __NULL__,
 	.updateammo	= w_hammer_updateammo,

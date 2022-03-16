@@ -54,7 +54,7 @@ void w_chainsaw_updateammo(player pl)
 {
 	Weapons_UpdateAmmo(pl, -1, -1, -1);
 }
-string w_chainsaw_pmodel(void)
+string w_chainsaw_pmodel(player pl)
 {
 	return "models/p_saw.mdl";
 }
@@ -63,25 +63,23 @@ string w_chainsaw_deathmsg(void)
 	return "%s killed %s with chainsaw.";
 }
 
-void w_chainsaw_draw(void)
+void w_chainsaw_draw(player pl)
 {
-	player pl = (player)self;
 	
 	Weapons_SetModel("models/v_chainsaw.mdl");
-	Weapons_ViewAnimation(CHAINSAW_DEPLOY);
+	Weapons_ViewAnimation(pl, CHAINSAW_DEPLOY);
 	
 #ifdef SERVER
 	Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.startup");
 #endif
 }
 
-void w_chainsaw_holster(void)
+void w_chainsaw_holster(player pl)
 {
-	Weapons_ViewAnimation(CHAINSAW_HOLSTER);
+	Weapons_ViewAnimation(pl, CHAINSAW_HOLSTER);
 }
-void w_chainsaw_primary(void)
+void w_chainsaw_primary(player pl)
 {
-	player pl = (player)self;
 
 	/* only do it in the attack state */
 	if (pl.ammo_chainsaw_state == CHAINSAWSTATE_ATTACKING)
@@ -89,10 +87,10 @@ void w_chainsaw_primary(void)
 			return;
 
 	pl.ammo_chainsaw_state = CHAINSAWSTATE_ATTACKING;
-	Weapons_ViewAnimation(CHAINSAW_CONTINUEFIRE);
+	Weapons_ViewAnimation(pl, CHAINSAW_CONTINUEFIRE);
 
 #ifdef SERVER
-	Weapons_MakeVectors();
+	Weapons_MakeVectors(pl);
 	vector src = pl.origin + pl.view_ofs;
 	traceline(src, src + (v_forward * 32), FALSE, pl);
 	
@@ -123,16 +121,15 @@ void w_chainsaw_primary(void)
 	pl.w_idle_next = 0.0f;
 }
 
-void w_chainsaw_release(void)
+void w_chainsaw_release(player pl)
 {
-	player pl = (player)self;
 
 	if (pl.w_idle_next)
 		return;
 
 	if (pl.ammo_chainsaw_state == CHAINSAWSTATE_ATTACKING) {
 		pl.ammo_chainsaw_state = CHAINSAWSTATE_IDLE;
-		Weapons_ViewAnimation(CHAINSAW_STOPFIRE);
+		Weapons_ViewAnimation(pl, CHAINSAW_STOPFIRE);
 #ifdef SERVER
 			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.idle");
 #endif
@@ -149,21 +146,21 @@ void w_chainsaw_release(void)
 		}
 		if (pl.w_attack_next <= 0.0f) {
 			if (random() < 0.5) {
-				Weapons_ViewAnimation(CHAINSAW_IDLE1);
+				Weapons_ViewAnimation(pl, CHAINSAW_IDLE1);
 			} else {
-				Weapons_ViewAnimation(CHAINSAW_IDLE2);
+				Weapons_ViewAnimation(pl, CHAINSAW_IDLE2);
 			}
 			pl.w_attack_next = 5.3333f;
 		}
 	}
 }
 
-float w_chainsaw_aimanim(void)
+float w_chainsaw_aimanim(player pl)
 {
-	return self.flags & FL_CROUCHING ? ANIM_CR_AIMEGON : ANIM_AIMEGON;
+	return pl.flags & FL_CROUCHING ? ANIM_CR_AIMEGON : ANIM_AIMEGON;
 }
 
-void w_chainsaw_hudpic(int s, vector pos, float a)
+void w_chainsaw_hudpic(player pl, int s, vector pos, float a)
 {
 #ifdef CLIENT
 	if (s) {
@@ -181,7 +178,7 @@ void w_chainsaw_hudpic(int s, vector pos, float a)
 weapon_t w_chainsaw =
 {
 	.name		= "chainsaw",
-	.id		= ITEM_CHAINSAW,
+	.id			= ITEM_CHAINSAW,
 	.slot		= 0,
 	.slot_pos	= 2,
 	.draw		= w_chainsaw_draw,
@@ -190,7 +187,7 @@ weapon_t w_chainsaw =
 	.secondary	= w_chainsaw_release,
 	.reload		= w_chainsaw_release,
 	.release	= w_chainsaw_release,
-	.crosshair	= __NULL__,
+	.postdraw	= __NULL__,
 	.precache	= w_chainsaw_precache,
 	.pickup		= __NULL__,
 	.updateammo	= w_chainsaw_updateammo,
