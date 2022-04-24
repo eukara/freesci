@@ -208,6 +208,9 @@ monster_scientist::TalkPanic(void)
 void
 monster_scientist::Pain(void)
 {
+	if (style == MONSTER_DEAD)
+		return;
+
 	if (autocvar_sh_sciattack)
 		CBaseMonster::Pain();
 
