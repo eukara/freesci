@@ -16,7 +16,7 @@
 
 #include "../../../src/server/gamerules.h"
 
-class SHMultiplayerRules:CGameRules
+class HLGameRules:CGameRules
 {
 	float m_flRestockTimer;
 	float m_flBreakRespawnTimer;
@@ -34,6 +34,7 @@ class SHMultiplayerRules:CGameRules
 	virtual void(base_player) LevelChangeParms;
 	virtual void(void) LevelNewParms;
 	virtual void(void) FrameStart;
+	virtual bool(void) IsMultiplayer;
 
-	void(void) SHMultiplayerRules;
+	void(void) HLGameRules;
 };

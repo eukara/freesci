@@ -17,7 +17,7 @@
 void
 Game_InitRules(void)
 {
-	g_grMode = spawn(SHMultiplayerRules);
+	g_grMode = spawn(HLGameRules);
 }
 
 void

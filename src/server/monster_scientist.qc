@@ -238,7 +238,7 @@ monster_scientist::Death(void)
 	StartleAllies();
 
 	if (style != MONSTER_DEAD) {
-		SHMultiplayerRules rules = (SHMultiplayerRules)g_grMode;
+		HLGameRules rules = (HLGameRules)g_grMode;
 
 		if (g_dmg_eAttacker.flags & FL_CLIENT)
 			rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);

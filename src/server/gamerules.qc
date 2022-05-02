@@ -17,8 +17,14 @@
 var int autocvar_sh_insanity = 10;
 var int autocvar_sv_playerkeepalive = TRUE;
 
+bool
+HLGameRules::IsMultiplayer(void)
+{
+	return true;
+}
+
 void
-SHMultiplayerRules::PlayerDeath(base_player pl)
+HLGameRules::PlayerDeath(base_player pl)
 {
 	/* obituary networking */
 	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
@@ -65,7 +71,7 @@ SHMultiplayerRules::PlayerDeath(base_player pl)
 }
 
 void
-SHMultiplayerRules::PlayerSpawn(base_player pp)
+HLGameRules::PlayerSpawn(base_player pp)
 {
 	player pl = (player)pp;
 	/* this is where the mods want to deviate */
@@ -114,7 +120,7 @@ SHMultiplayerRules::PlayerSpawn(base_player pp)
 }
 
 void
-SHMultiplayerRules::LevelDecodeParms(base_player pp)
+HLGameRules::LevelDecodeParms(base_player pp)
 {
 	player pl = (player)pp;
 	g_landmarkpos[0] = parm1;
@@ -159,7 +165,7 @@ SHMultiplayerRules::LevelDecodeParms(base_player pp)
 }
 
 void
-SHMultiplayerRules::LevelChangeParms(base_player pp)
+HLGameRules::LevelChangeParms(base_player pp)
 {
 	player pl = (player)pp;
 	parm1 = g_landmarkpos[0];
@@ -196,7 +202,7 @@ SHMultiplayerRules::LevelChangeParms(base_player pp)
 }
 
 void
-SHMultiplayerRules::LevelNewParms(void)
+HLGameRules::LevelNewParms(void)
 {
 	parm1 = parm2 = parm3 = parm4 = parm5 = parm6 = parm7 =
 	parm8 = parm9 = parm10 = parm11 = parm12 = parm13 = parm14 =
@@ -209,7 +215,7 @@ SHMultiplayerRules::LevelNewParms(void)
 /* we check what fields have changed over the course of the frame and network
  * only the ones that have actually changed */
 void
-SHMultiplayerRules::PlayerPostFrame(base_player pp)
+HLGameRules::PlayerPostFrame(base_player pp)
 {
 	player pl = (player)pp;
 
@@ -226,14 +232,14 @@ SHMultiplayerRules::PlayerPostFrame(base_player pp)
 }
 
 void
-SHMultiplayerRules::PlayerConnect(base_player pl)
+HLGameRules::PlayerConnect(base_player pl)
 {
 	if (Plugin_PlayerConnect(pl) == FALSE)
 		bprint(PRINT_HIGH, sprintf("%s connected\n", pl.netname));
 }
 
 void
-SHMultiplayerRules::PlayerDisconnect(base_player pl)
+HLGameRules::PlayerDisconnect(base_player pl)
 {
 	bprint(PRINT_HIGH, sprintf("%s disconnected\n", pl.netname));
 
@@ -247,14 +253,14 @@ SHMultiplayerRules::PlayerDisconnect(base_player pl)
 }
 
 void
-SHMultiplayerRules::PlayerKill(base_player pp)
+HLGameRules::PlayerKill(base_player pp)
 {
 	player pl = (player)pp;
 	Damage_Apply(pl, pl, pl.health, WEAPON_NONE, DMG_SKIP_ARMOR);
 }
 
 void
-SHMultiplayerRules::ScientistKill(base_player pp, entity sci)
+HLGameRules::ScientistKill(base_player pp, entity sci)
 {
 	player pl = (player)pp;
 	/* obituary networking */
@@ -293,7 +299,7 @@ SHMultiplayerRules::ScientistKill(base_player pp, entity sci)
 }
 
 void
-SHMultiplayerRules::FrameStart(void)
+HLGameRules::FrameStart(void)
 {
 	entity e;
 
@@ -326,7 +332,7 @@ SHMultiplayerRules::FrameStart(void)
 }
 
 void
-SHMultiplayerRules::SHMultiplayerRules(void)
+HLGameRules::HLGameRules(void)
 {
 	CGameRules::CGameRules();
 }
