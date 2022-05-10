@@ -65,7 +65,7 @@ enum
 	SCIA_DEADTABLE3
 };
 
-class monster_scientist:CBaseNPC
+class monster_scientist:NSTalkMonster
 {
 	void(void) monster_scientist;
 
@@ -212,7 +212,7 @@ monster_scientist::Pain(void)
 		return;
 
 	if (autocvar_sh_sciattack)
-		CBaseMonster::Pain();
+		super::Pain();
 
 	StartleAllies();
 
@@ -250,7 +250,7 @@ monster_scientist::Death(void)
 	}
 
 	/* now mark our state as 'dead' */
-	CBaseNPC::Death();
+	super::Death();
 	think = Respawn;
 	nextthink = time + 10.0f;
 }
@@ -261,13 +261,13 @@ monster_scientist::OnPlayerUse(void)
 	if (m_iFlags & MONSTER_FEAR)
 		return;
 
-	CBaseNPC::OnPlayerUse();
+	super::OnPlayerUse();
 }
 
 void
 monster_scientist::Respawn(void)
 {
-	CBaseNPC::Respawn();
+	super::Respawn();
 	m_iFlags |= MONSTER_CANFOLLOW;
 	PlayerUse = OnPlayerUse;
 	health = base_health = Skill_GetValue("scientist_health", 20);
@@ -329,7 +329,7 @@ monster_scientist::monster_scientist(void)
 	base_mins = [-16,-16,0];
 	base_maxs = [16,16,72];
 	base_health = Skill_GetValue("scientist_health", 20);
-	CBaseNPC::CBaseNPC();
+	super::NSTalkMonster();
 	precache_model(GetSpawnModel());
 
 	if (m_iBody == -1) {
