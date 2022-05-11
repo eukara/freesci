@@ -22,16 +22,16 @@ class HLGameRules:CGameRules
 	float m_flBreakRespawnTimer;
 
 	/* client */
-	virtual void(base_player) PlayerSpawn;
-	virtual void(base_player) PlayerConnect;
-	virtual void(base_player) PlayerDisconnect;
-	virtual void(base_player) PlayerKill;
-	virtual void(base_player) PlayerDeath;
-	virtual void(base_player) PlayerPostFrame;
-	virtual void(base_player, entity) ScientistKill;
+	virtual void(NSClientPlayer) PlayerSpawn;
+	virtual void(NSClientPlayer) PlayerConnect;
+	virtual void(NSClientPlayer) PlayerDisconnect;
+	virtual void(NSClientPlayer) PlayerKill;
+	virtual void(NSClientPlayer) PlayerDeath;
+	virtual void(NSClientPlayer) PlayerPostFrame;
+	virtual void(NSClientPlayer, entity) ScientistKill;
 
-	virtual void(base_player) LevelDecodeParms;
-	virtual void(base_player) LevelChangeParms;
+	virtual void(NSClientPlayer) LevelDecodeParms;
+	virtual void(NSClientPlayer) LevelChangeParms;
 	virtual void(void) LevelNewParms;
 	virtual void(void) FrameStart;
 	virtual bool(void) IsMultiplayer;
