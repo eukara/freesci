@@ -276,6 +276,29 @@ monster_scientist::Respawn(void)
 	if (autocvar_sh_scialert) {
 		m_iFlags |= MONSTER_FEAR;
 	}
+
+	m_iBody = floor(random(1,5));
+
+	SetSkin(0);
+
+	switch (m_iBody) {
+		case 1:
+			m_flPitch = 105;
+			netname = "Walter";
+			break;
+		case 2:
+			m_flPitch = 100;
+			netname = "Einstein";
+			break;
+		case 3:
+			m_flPitch = 95;
+			netname = "Luther";
+			SetSkin(1);
+			break;
+		default:
+			m_flPitch = 100;
+			netname = "Slick";
+	}
 }
 
 void
@@ -291,17 +314,6 @@ monster_scientist::monster_scientist(void)
 
 	Sound_Precache("monster_scientist.die");
 	Sound_Precache("monster_scientist.pain");
-
-	m_iBody = -1;
-	for (int i = 1; i < (tokenize(__fullspawndata)-1); i += 2) {
-		switch (argv(i)) {
-		case "body":
-			m_iBody = stoi(argv(i+1)) + 1;
-			break;
-		default:
-			break;
-		}
-	}
 
 	m_talkAsk = "!SC_QUESTION";
 	m_talkPlayerAsk = "!SC_PQUEST";
@@ -319,8 +331,6 @@ monster_scientist::monster_scientist(void)
 	m_talkUnfollow = "!SC_WAIT";
 	m_talkFollow = "!SC_OK";
 	m_talkStopFollow = "!SC_STOP";
-	
-	m_iBody = -1;
 
 	if (autocvar_sh_sciattack)
 		m_iAlliance = MAL_ALIEN;
@@ -329,31 +339,5 @@ monster_scientist::monster_scientist(void)
 	base_mins = [-16,-16,0];
 	base_maxs = [16,16,72];
 	base_health = Skill_GetValue("scientist_health", 20);
-	super::NSTalkMonster();
-	precache_model(GetSpawnModel());
-
-	if (m_iBody == -1) {
-		/* This stuff needs to be persistent because we can't guarantee that
-		* the client-side geomset refresh happens. Don't shove this into Respawn */
-		m_iBody = floor(random(1,5));
-	}
-
-	switch (m_iBody) {
-		case 1:
-			m_flPitch = 105;
-			netname = "Walter";
-			break;
-		case 2:
-			m_flPitch = 100;
-			netname = "Einstein";
-			break;
-		case 3:
-			m_flPitch = 95;
-			netname = "Luther";
-			skin = 1;
-			break;
-		default:
-			m_flPitch = 100;
-			netname = "Slick";
-	}
+	precache_model(model);
 }
