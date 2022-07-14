@@ -17,7 +17,25 @@
 void
 Game_InitRules(void)
 {
-	g_grMode = spawn(HLGameRules);
+	switch (autocvar_sv_realistic) {
+	case SHMODE_STANDARD:
+		g_grMode = spawn(SHGameHunt);
+		break;
+	case SHMODE_STEALTH:
+		g_grMode = spawn(SHGameStealth);
+		break;
+	case SHMODE_SLAUGHTER:
+		g_grMode = spawn(SHGameSlaughter);
+		break;
+	case SHMODE_LIVEINFEAR:
+		g_grMode = spawn(SHGameFear);
+		break;
+	case SHMODE_MADNESS:
+		g_grMode = spawn(SHGameMadness);
+		break;
+	default:
+		g_grMode = spawn(HLGameRules);
+	}
 }
 
 void

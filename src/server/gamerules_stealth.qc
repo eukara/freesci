@@ -1,0 +1,5 @@
+void
+SHGameStealth::SHGameStealth(void)
+{
+
+}

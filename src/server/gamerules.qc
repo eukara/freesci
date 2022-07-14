@@ -336,3 +336,16 @@ HLGameRules::HLGameRules(void)
 {
 	CGameRules::CGameRules();
 }
+
+/* TEAMPLAY ONLY LOGIC */
+bool
+SHTeamRules::IsTeamPlay(void)
+{
+	return true;
+}
+
+void
+SHTeamRules::SHTeamRules(void)
+{
+
+}

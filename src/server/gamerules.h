@@ -38,3 +38,68 @@ class HLGameRules:CGameRules
 
 	void(void) HLGameRules;
 };
+
+class SHTeamRules:HLGameRules
+{
+	void(void) SHTeamRules;
+
+	virtual bool(void) IsTeamPlay;
+};
+
+/* Standard Hunting (0):
+	Round-based competitive killing where scientists are always running around. Scientists don't respawn.
+*/
+class SHGameHunt:SHTeamRules
+{
+
+	void(void) SHGameHunt;
+};
+
+/* Stealth Hunting (1):
+	Round-based competitive killing where scientists stand or walk around, but will run in fear if they see the player. Scientists don't respawn. Similar to deer hunting.
+*/
+class SHGameStealth:SHTeamRules
+{
+
+	void(void) SHGameStealth;
+};
+
+/* Traditional Slaughter (2):
+	Casual killing where scientists treat the player same as in Single Player. Scientists respawn. I suggest we just leave teams out on this one?
+*/
+class SHGameSlaughter:HLGameRules
+{
+
+	void(void) SHGameSlaughter;
+};
+
+/* Live in Fear (3):
+	Unique round-based gamemode where players have to only kill an evil randomly selected player controlled scientist causing chaos. Those who kill good scientists are punished with lost points. The evil scientist gains one point from every kill (NPC or Players). Scientists respawn. This is the only gamemode where there are no teams.
+*/
+class SHGameFear:HLGameRules
+{
+
+	void(void) SHGameFear;
+};
+
+/* Madness (4):
+	Unique gamemode where scientists attack themselves and the players. Scientists inject players and NPCs only once with a poison that slowly drains their health to 0. The scientists also play a sound (sh/hide_laugh.wav) when they get a sucessful kill and are still alive. Scientists respawn. We use to have something similar, still in the logic?
+*/
+class SHGameMadness:HLGameRules
+{
+
+	void(void) SHGameMadness;
+};
+
+
+typedef enum
+{
+	SHMODE_STANDARD = 0,
+	SHMODE_STEALTH,
+	SHMODE_SLAUGHTER,
+	SHMODE_LIVEINFEAR,
+	SHMODE_MADNESS
+} shmode_e;
+
+
+var shmode_e autocvar_sv_realistic = SHMODE_SLAUGHTER;

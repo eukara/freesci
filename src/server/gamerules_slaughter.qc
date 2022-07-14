@@ -1,0 +1,5 @@
+void
+SHGameSlaughter::SHGameSlaughter(void)
+{
+
+}

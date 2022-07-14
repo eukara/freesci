@@ -1,0 +1,5 @@
+void
+SHGameMadness::SHGameMadness(void)
+{
+
+}

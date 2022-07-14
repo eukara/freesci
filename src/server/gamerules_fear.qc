@@ -1,0 +1,5 @@
+void
+SHGameFear::SHGameFear(void)
+{
+
+}

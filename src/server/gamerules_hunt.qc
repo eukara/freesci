@@ -1,0 +1,5 @@
+void
+SHGameHunt::SHGameHunt(void)
+{
+
+}
