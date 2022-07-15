@@ -40,6 +40,7 @@ class HLGameRules:CGameRules
 	virtual void(void) CountScientists;
 
 	void(void) HLGameRules;
+	virtual void(void) InitPostEnts;
 };
 
 class SHTeamRules:HLGameRules
@@ -57,6 +58,7 @@ class SHTeamRules:HLGameRules
 	virtual void(void) AddTeam1Kill;
 	virtual void(void) AddTeam2Kill;
 	virtual void(NSClientPlayer, entity) ScientistKill;
+	virtual void(void) InitPostEnts;
 };
 
 /* Standard Hunting (0):

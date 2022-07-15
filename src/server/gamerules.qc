@@ -276,6 +276,7 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 	WriteByte(MSG_MULTICAST, 0);
 	msg_entity = world;
 	multicast([0,0,0], MULTICAST_ALL);
+
 	pl.frags++;
 
 	/*if (g_weapons[g_dmg_iWeapon].slot != 0)
@@ -336,7 +337,7 @@ HLGameRules::FrameStart(void)
 }
 
 void
-HLGameRules::HLGameRules(void)
+HLGameRules::InitPostEnts(void)
 {
 	forceinfokey(world, "teams", "0");
 	forceinfokey(world, "team_1", "");
@@ -345,6 +346,14 @@ HLGameRules::HLGameRules(void)
 	forceinfokey(world, "teamscore_2", "0");
 	forceinfokey(world, "teamkills_1", "0");
 	forceinfokey(world, "teamkills_2", "0");
+	m_iScientistsAlive = 0;
+	m_flRestockTimer = 0;
+	m_flBreakRespawnTimer = 0;
+}
+
+void
+HLGameRules::HLGameRules(void)
+{
 }
 
 /* TEAMPLAY ONLY LOGIC */
@@ -410,10 +419,8 @@ SHTeamRules::AddTeam2Kill(void)
 }
 
 void
-SHTeamRules::SHTeamRules(void)
+SHTeamRules::InitPostEnts(void)
 {
-	m_iKillsTeam1 = 0;
-	m_iKillsTeam2 = 0;
 	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
 	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
 	forceinfokey(world, "teams", "2");
@@ -421,4 +428,11 @@ SHTeamRules::SHTeamRules(void)
 	forceinfokey(world, "teamscore_1", "0");
 	forceinfokey(world, "team_2", "Blue");
 	forceinfokey(world, "teamscore_2", "0");
+}
+
+void
+SHTeamRules::SHTeamRules(void)
+{
+	m_iKillsTeam1 = 0;
+	m_iKillsTeam2 = 0;
 }
