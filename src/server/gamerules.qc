@@ -431,6 +431,17 @@ SHTeamRules::InitPostEnts(void)
 }
 
 void
+SHTeamRules::RestartRound(void)
+{
+	super::RestartRound();
+
+	m_iKillsTeam1 = 0;
+	m_iKillsTeam2 = 0;
+	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
+	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
+}
+
+void
 SHTeamRules::SHTeamRules(void)
 {
 	m_iKillsTeam1 = 0;

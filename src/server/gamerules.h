@@ -53,6 +53,7 @@ class SHTeamRules:HLGameRules
 
 	void(void) SHTeamRules;
 
+	virtual void(void) RestartRound;
 	virtual void(NSClientPlayer) PlayerSpawn;
 	virtual bool(void) IsTeamPlay;
 	virtual void(void) AddTeam1Kill;
