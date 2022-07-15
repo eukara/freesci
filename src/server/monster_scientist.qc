@@ -241,7 +241,9 @@ monster_scientist::Death(void)
 	StartleAllies();
 
 	if (style != MONSTER_DEAD) {
-		rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
+		if (g_dmg_eAttacker.flags & FL_CLIENT)
+			rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
+
 		Plugin_PlayerObituary(g_dmg_eAttacker, this, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
 		SetFrame(SCIA_DIE_SIMPLE + floor(random(0, 6)));
 		Sound_Speak(this, "monster_scientist.die");
