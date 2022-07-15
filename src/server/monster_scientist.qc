@@ -235,22 +235,31 @@ monster_scientist::Pain(void)
 void
 monster_scientist::Death(void)
 {
+	bool deathcheck = false;
+	HLGameRules rules = (HLGameRules)g_grMode;
+
 	StartleAllies();
 
 	if (style != MONSTER_DEAD) {
-		HLGameRules rules = (HLGameRules)g_grMode;
-
-		if (g_dmg_eAttacker.flags & FL_CLIENT)
-			rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
-
+		rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
 		Plugin_PlayerObituary(g_dmg_eAttacker, this, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
-
 		SetFrame(SCIA_DIE_SIMPLE + floor(random(0, 6)));
 		Sound_Speak(this, "monster_scientist.die");
+		deathcheck = true;
 	}
 
 	/* now mark our state as 'dead' */
 	super::Death();
+
+	/* now we'll tell our kill function about it, since we're now legally dead */
+	if (deathcheck == true) {
+		rules.RegisterSciDeath();
+	}
+
+	/* will not respawn by themselves in this mode */
+	if (g_chosen_mode == SHMODE_STANDARD)
+		return;
+
 	think = Respawn;
 	nextthink = time + 10.0f;
 }
@@ -267,13 +276,15 @@ monster_scientist::OnPlayerUse(void)
 void
 monster_scientist::Respawn(void)
 {
+	HLGameRules rules = (HLGameRules)g_grMode;
+
 	super::Respawn();
 	m_iFlags |= MONSTER_CANFOLLOW;
 	PlayerUse = OnPlayerUse;
 	health = base_health = Skill_GetValue("scientist_health", 20);
 	takedamage = DAMAGE_YES;
 
-	if (autocvar_sh_scialert) {
+	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD) {
 		m_iFlags |= MONSTER_FEAR;
 	}
 
@@ -299,6 +310,8 @@ monster_scientist::Respawn(void)
 			m_flPitch = 100;
 			netname = "Slick";
 	}
+
+	rules.CountScientists();
 }
 
 void

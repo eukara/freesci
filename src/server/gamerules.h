@@ -18,32 +18,45 @@
 
 class HLGameRules:CGameRules
 {
+	int m_iScientistsAlive;
+
 	float m_flRestockTimer;
 	float m_flBreakRespawnTimer;
 
 	/* client */
 	virtual void(NSClientPlayer) PlayerSpawn;
-	virtual void(NSClientPlayer) PlayerConnect;
-	virtual void(NSClientPlayer) PlayerDisconnect;
-	virtual void(NSClientPlayer) PlayerKill;
 	virtual void(NSClientPlayer) PlayerDeath;
 	virtual void(NSClientPlayer) PlayerPostFrame;
 	virtual void(NSClientPlayer, entity) ScientistKill;
+	virtual void(void) RegisterSciDeath;
 
 	virtual void(NSClientPlayer) LevelDecodeParms;
 	virtual void(NSClientPlayer) LevelChangeParms;
 	virtual void(void) LevelNewParms;
 	virtual void(void) FrameStart;
 	virtual bool(void) IsMultiplayer;
+	virtual void(void) RestartRound;
+
+	virtual void(void) CountScientists;
 
 	void(void) HLGameRules;
 };
 
 class SHTeamRules:HLGameRules
 {
+	int m_iKillsTeam1;
+	int m_iKillsTeam2;
+
+	int m_iScoreTeam1;
+	int m_iScoreTeam2;
+
 	void(void) SHTeamRules;
 
+	virtual void(NSClientPlayer) PlayerSpawn;
 	virtual bool(void) IsTeamPlay;
+	virtual void(void) AddTeam1Kill;
+	virtual void(void) AddTeam2Kill;
+	virtual void(NSClientPlayer, entity) ScientistKill;
 };
 
 /* Standard Hunting (0):
@@ -51,8 +64,9 @@ class SHTeamRules:HLGameRules
 */
 class SHGameHunt:SHTeamRules
 {
-
 	void(void) SHGameHunt;
+
+	virtual void(void) RegisterSciDeath;
 };
 
 /* Stealth Hunting (1):
@@ -74,7 +88,7 @@ class SHGameSlaughter:HLGameRules
 };
 
 /* Live in Fear (3):
-	Unique round-based gamemode where players have to only kill an evil randomly selected player controlled scientist causing chaos. Those who kill good scientists are punished with lost points. The evil scientist gains one point from every kill (NPC or Players). Scientists respawn. This is the only gamemode where there are no teams.
+	Unique round-based gamemode where players have to only kill an evil randomly selected player controlled scientist causing chaos. Those who kill good scientists are punished with lost points. The evil scientist gains one point from every kill (NPC or Players). Scientists respawn.
 */
 class SHGameFear:HLGameRules
 {
@@ -83,14 +97,13 @@ class SHGameFear:HLGameRules
 };
 
 /* Madness (4):
-	Unique gamemode where scientists attack themselves and the players. Scientists inject players and NPCs only once with a poison that slowly drains their health to 0. The scientists also play a sound (sh/hide_laugh.wav) when they get a sucessful kill and are still alive. Scientists respawn. We use to have something similar, still in the logic?
+	Unique gamemode where scientists attack themselves and the players. Scientists inject players and NPCs only once with a poison that slowly drains their health to 0. The scientists also play a sound (sh/hide_laugh.wav) when they get a sucessful kill and are still alive. Scientists respawn.
 */
 class SHGameMadness:HLGameRules
 {
 
 	void(void) SHGameMadness;
 };
-
 
 typedef enum
 {
@@ -101,5 +114,5 @@ typedef enum
 	SHMODE_MADNESS
 } shmode_e;
 
-
 var shmode_e autocvar_sv_realistic = SHMODE_SLAUGHTER;
+var shmode_e g_chosen_mode;

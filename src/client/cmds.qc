@@ -14,43 +14,18 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-void
-Game_InitRules(void)
+int
+ClientGame_ConsoleCommand(void)
 {
-	g_chosen_mode = autocvar_sv_realistic;
-
-	switch (autocvar_sv_realistic) {
-	case SHMODE_STANDARD:
-		g_grMode = spawn(SHGameHunt);
+	switch(argv(0)) {
+	case "+sciboard":
+		g_sciboard = true;
 		break;
-	case SHMODE_STEALTH:
-		g_grMode = spawn(SHGameStealth);
-		break;
-	case SHMODE_SLAUGHTER:
-		g_grMode = spawn(SHGameSlaughter);
-		break;
-	case SHMODE_LIVEINFEAR:
-		g_grMode = spawn(SHGameFear);
-		break;
-	case SHMODE_MADNESS:
-		g_grMode = spawn(SHGameMadness);
+	case "-sciboard":
+		g_sciboard = false;
 		break;
 	default:
-		g_grMode = spawn(HLGameRules);
+		return (0);
 	}
-}
-
-void
-Game_Worldspawn(void)
-{
-	precache_model("models/player.mdl");
-	precache_model("models/w_weaponbox.mdl");
-	Sound_Precache("player.die");
-	Sound_Precache("player.fall");
-	Sound_Precache("player.lightfall");
-
-	Player_Precache();
-	Weapons_Init();
-	SHData_Parse(mapname);
-	FX_Corpse_Init();
+	return (1);
 }

@@ -17,6 +17,26 @@
 var int autocvar_sh_insanity = 10;
 var int autocvar_sv_playerkeepalive = TRUE;
 
+void
+HLGameRules::RestartRound(void)
+{
+	/* respawn all players and scientists */
+	for (entity e = world; (e = find( e, ::classname, "player"));) {
+		PlayerSpawn((NSClientPlayer)e);
+	}
+	for (entity e = world; (e = find( e, ::classname, "monster_scientist"));) {
+		NSEntity sci = (NSEntity)e;
+		sci.Respawn();
+	}
+	env_message_broadcast("New round, let's go!");
+}
+
+void
+HLGameRules::RegisterSciDeath(void)
+{
+	CountScientists();
+}
+
 bool
 HLGameRules::IsMultiplayer(void)
 {
@@ -232,31 +252,15 @@ HLGameRules::PlayerPostFrame(NSClientPlayer pp)
 }
 
 void
-HLGameRules::PlayerConnect(NSClientPlayer pl)
+HLGameRules::CountScientists(void)
 {
-	if (Plugin_PlayerConnect(pl) == FALSE)
-		bprint(PRINT_HIGH, sprintf("%s connected\n", pl.netname));
-}
+	m_iScientistsAlive = 0;
+	for (entity s = world; (s = find(s, ::classname, "monster_scientist"));) {
+		if (s.solid == SOLID_BBOX || s.solid == SOLID_SLIDEBOX)
+			m_iScientistsAlive++;
+	}
 
-void
-HLGameRules::PlayerDisconnect(NSClientPlayer pl)
-{
-	bprint(PRINT_HIGH, sprintf("%s disconnected\n", pl.netname));
-
-	/* Make this unusable */
-	pl.solid = SOLID_NOT;
-	pl.movetype = MOVETYPE_NONE;
-	pl.modelindex = 0;
-	pl.health = 0;
-	pl.takedamage = 0;
-	pl.SendFlags = PLAYER_MODELINDEX;
-}
-
-void
-HLGameRules::PlayerKill(NSClientPlayer pp)
-{
-	player pl = (player)pp;
-	Damage_Apply(pl, pl, pl.health, WEAPON_NONE, DMG_SKIP_ARMOR);
+	forceinfokey(world, "sci_count", sprintf("%i", m_iScientistsAlive));
 }
 
 void
@@ -334,7 +338,13 @@ HLGameRules::FrameStart(void)
 void
 HLGameRules::HLGameRules(void)
 {
-	CGameRules::CGameRules();
+	forceinfokey(world, "teams", "0");
+	forceinfokey(world, "team_1", "");
+	forceinfokey(world, "team_2", "");
+	forceinfokey(world, "teamscore_1", "0");
+	forceinfokey(world, "teamscore_2", "0");
+	forceinfokey(world, "teamkills_1", "0");
+	forceinfokey(world, "teamkills_2", "0");
 }
 
 /* TEAMPLAY ONLY LOGIC */
@@ -345,7 +355,70 @@ SHTeamRules::IsTeamPlay(void)
 }
 
 void
+SHTeamRules::PlayerSpawn(NSClientPlayer cl)
+{
+	int red = 0;
+	int blue = 0;
+
+	super::PlayerSpawn(cl);
+
+	/* remove this if you want an auto-balance upon every death */
+	if (cl.team != 0)
+		return;
+
+	for (entity e = world; (e = find( e, ::classname, "player"));) {
+		if (e == cl)
+			continue;
+		if (e.team == 1)
+			red++;
+		if (e.team == 2)
+			blue++;
+	}
+
+	/* assign to whatever team has fewer players */
+	if (red > blue)
+		cl.team = 2;
+	else
+		cl.team = 1;
+
+	forceinfokey(cl, "*team", sprintf("%d", cl.team));
+}
+
+void
+SHTeamRules::ScientistKill(NSClientPlayer cl, entity sci)
+{
+	super::ScientistKill(cl, sci);
+
+	if (cl.team == 2)
+		AddTeam2Kill();
+	else if (cl.team == 1)
+		AddTeam1Kill();
+}
+
+void
+SHTeamRules::AddTeam1Kill(void)
+{
+	m_iKillsTeam1++;
+	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
+}
+
+void
+SHTeamRules::AddTeam2Kill(void)
+{
+	m_iKillsTeam2++;
+	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
+}
+
+void
 SHTeamRules::SHTeamRules(void)
 {
-
+	m_iKillsTeam1 = 0;
+	m_iKillsTeam2 = 0;
+	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
+	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
+	forceinfokey(world, "teams", "2");
+	forceinfokey(world, "team_1", "Red");
+	forceinfokey(world, "teamscore_1", "0");
+	forceinfokey(world, "team_2", "Blue");
+	forceinfokey(world, "teamscore_2", "0");
 }

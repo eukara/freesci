@@ -19,12 +19,12 @@
 ../shared/include.src
 
 ../../../valve/src/client/damage.qc
-../../../base/src/client/draw.qc
+draw.qc
 ../../../valve/src/client/init.qc
 ../../../valve/src/client/flashlight.qc
 ../../../valve/src/client/player.qc
 ../../../valve/src/client/entities.qc
-../../../valve/src/client/cmds.qc
+cmds.qc
 ../../../valve/src/client/game_event.qc
 ../../../valve/src/client/camera.qc
 ../../../valve/src/client/viewmodel.qc
