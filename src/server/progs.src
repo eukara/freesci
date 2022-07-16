@@ -81,7 +81,6 @@ gamerules_stealth.qc
 ../../../valve/src/server/client.qc
 server.qc
 ../../../base/src/server/damage.qc
-../../../valve/src/server/rules.qc
 ../../../valve/src/server/flashlight.qc
 ../../../base/src/server/modelevent.qc
 

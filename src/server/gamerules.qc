@@ -15,7 +15,6 @@
  */
 
 var int autocvar_sh_insanity = 10;
-var int autocvar_sv_playerkeepalive = TRUE;
 
 void
 HLGameRules::RestartRound(void)
@@ -358,7 +357,7 @@ HLGameRules::HLGameRules(void)
 
 /* TEAMPLAY ONLY LOGIC */
 bool
-SHTeamRules::IsTeamPlay(void)
+SHTeamRules::IsTeamplay(void)
 {
 	return true;
 }
