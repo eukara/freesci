@@ -208,7 +208,8 @@ monster_scientist::TalkPanic(void)
 void
 monster_scientist::Pain(void)
 {
-	if (style == MONSTER_DEAD)
+	/* don't bother if we're fully dead */
+	if (IsAlive() == false)
 		return;
 
 	if (autocvar_sh_sciattack)
@@ -216,17 +217,13 @@ monster_scientist::Pain(void)
 
 	StartleAllies();
 
-	if (m_flAnimTime > time) {
+	if (InAnimation() == true)
 		return;
-	}
 
-	if (random() < 0.25f) {
+	if (random() < 0.25f)
 		return;
-	}
 
-	if (style != MONSTER_DEAD)
-		Sound_Speak(this, "monster_scientist.pain");
-
+	Sound_Speak(this, "monster_scientist.pain");
 	frame = SCIA_FLINCH + floor(random(0, 6));
 	m_flAnimTime = time + 0.25f;
 	m_iFlags |= MONSTER_FEAR;
@@ -240,7 +237,7 @@ monster_scientist::Death(void)
 
 	StartleAllies();
 
-	if (style != MONSTER_DEAD) {
+	if (IsAlive() == false) {
 		if (g_dmg_eAttacker.flags & FL_CLIENT)
 			rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
 
