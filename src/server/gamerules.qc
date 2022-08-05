@@ -85,7 +85,7 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 	if (pl.health < -50) {
 		FX_GibHuman(pl.origin, vectoangles(pl.origin - g_dmg_eAttacker.origin), g_dmg_iDamage * 2.0f);
 	} else {
-		FX_Corpse_Spawn(pl, ANIM_DIESIMPLE);
+		FX_Corpse_Spawn((player)pl, ANIM_DIESIMPLE);
 	}
 }
 
