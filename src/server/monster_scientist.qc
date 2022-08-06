@@ -237,7 +237,7 @@ monster_scientist::Death(void)
 
 	StartleAllies();
 
-	if (IsAlive() == false) {
+	if (IsAlive() == true) {
 		if (g_dmg_eAttacker.flags & FL_CLIENT)
 			rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
 
