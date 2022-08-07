@@ -225,7 +225,7 @@ void w_hammer_hudpic(player pl, int s, vector pos, float a)
 weapon_t w_hammer =
 {
 	.name		= "hammer",
-	.id			= ITEM_HAMMER,
+	.id		= ITEM_HAMMER,
 	.slot		= 0,
 	.slot_pos	= 1,
 	.draw		= w_hammer_draw,
