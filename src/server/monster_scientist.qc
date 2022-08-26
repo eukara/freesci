@@ -352,4 +352,5 @@ monster_scientist::monster_scientist(void)
 	base_maxs = [16,16,72];
 	base_health = Skill_GetValue("scientist_health", 20);
 	precache_model(model);
+	iBleeds = true;
 }
