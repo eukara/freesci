@@ -71,11 +71,10 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 			g_dmg_eAttacker.frags++;
 	}
 
-	pl.movetype = MOVETYPE_NONE;
-	pl.solid = SOLID_NOT;
+	pl.Death();
 	pl.takedamage = DAMAGE_NO;
 	pl.gflags &= ~GF_FLASHLIGHT;
-	pl.armor = pl.activeweapon = pl.g_items = 0;
+	pl.gflags &= ~GF_EGONBEAM;
 
 	pl.think = PutClientInServer;
 	pl.nextthink = time + 4.0f;
