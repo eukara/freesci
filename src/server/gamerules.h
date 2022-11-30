@@ -14,8 +14,6 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "../../../src/server/gamerules.h"
-
 class HLGameRules:CGameRules
 {
 	int m_iScientistsAlive;

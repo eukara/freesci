@@ -30,47 +30,44 @@ enumflags
 class player:NSClientPlayer
 {
 	/* Weapon specific */
-	PREDICTED_INT(glock_mag);
-	PREDICTED_INT(mp5_mag);
-	PREDICTED_INT(python_mag);
-	PREDICTED_INT(shotgun_mag);
-	PREDICTED_INT(crossbow_mag);
-	PREDICTED_INT(rpg_mag);
-	PREDICTED_INT(satchel_chg);
-	PREDICTED_INT(cannon_mag);
+	PREDICTED_INT(glock_mag)
+	PREDICTED_INT(mp5_mag)
+	PREDICTED_INT(python_mag)
+	PREDICTED_INT(shotgun_mag)
+	PREDICTED_INT(crossbow_mag)
+	PREDICTED_INT(rpg_mag)
+	PREDICTED_INT(satchel_chg)
+	PREDICTED_INT(cannon_mag)
 
-	PREDICTED_INT(ammo_9mm);
-	PREDICTED_INT(ammo_357);
-	PREDICTED_INT(ammo_buckshot);
-	PREDICTED_INT(ammo_bolt);
-	PREDICTED_INT(ammo_rocket);
-	PREDICTED_INT(ammo_uranium);
-	PREDICTED_INT(ammo_handgrenade);
-	PREDICTED_INT(ammo_satchel);
-	PREDICTED_INT(ammo_tripmine);
-	PREDICTED_INT(ammo_snark);
-	PREDICTED_INT(ammo_hornet);
+	PREDICTED_INT(ammo_9mm)
+	PREDICTED_INT(ammo_357)
+	PREDICTED_INT(ammo_buckshot)
+	PREDICTED_INT(ammo_bolt)
+	PREDICTED_INT(ammo_rocket)
+	PREDICTED_INT(ammo_uranium)
+	PREDICTED_INT(ammo_handgrenade)
+	PREDICTED_INT(ammo_satchel)
+	PREDICTED_INT(ammo_tripmine)
+	PREDICTED_INT(ammo_snark)
+	PREDICTED_INT(ammo_hornet)
 
-	PREDICTED_INT(ammo_m203_grenade);
-	PREDICTED_INT(ammo_shotgun_state);
-	PREDICTED_INT(ammo_gauss_state);
-	PREDICTED_INT(ammo_gauss_volume);
-	PREDICTED_INT(ammo_egon_state);
-	PREDICTED_INT(ammo_rpg_state);
-	PREDICTED_INT(mode_tempstate);
-	PREDICTED_INT(ammo_chainsaw_state);
-	PREDICTED_INT(ammo_hammer_state);
+	PREDICTED_INT(ammo_m203_grenade)
+	PREDICTED_INT(ammo_shotgun_state)
+	PREDICTED_INT(ammo_gauss_state)
+	PREDICTED_INT(ammo_gauss_volume)
+	PREDICTED_INT(ammo_egon_state)
+	PREDICTED_INT(ammo_rpg_state)
+	PREDICTED_INT(mode_tempstate)
+	PREDICTED_INT(ammo_chainsaw_state)
+	PREDICTED_INT(ammo_hammer_state)
 
-	PREDICTED_FLOAT(anim_top);
-	PREDICTED_FLOAT(anim_top_time);
-	PREDICTED_FLOAT(anim_top_delay);
-	PREDICTED_FLOAT(anim_bottom);
-	PREDICTED_FLOAT(anim_bottom_time);
+	PREDICTED_FLOAT(anim_top)
+	PREDICTED_FLOAT(anim_top_time)
+	PREDICTED_FLOAT(anim_top_delay)
+	PREDICTED_FLOAT(anim_bottom)
+	PREDICTED_FLOAT(anim_bottom_time)
 
 #ifdef CLIENT
-	virtual void(void) draw;
-	virtual float() predraw;
-	virtual void(void) postdraw;
 	virtual void(float,float) ReceiveEntity;
 	virtual void(void) PredictPreFrame;
 	virtual void(void) PredictPostFrame;
