@@ -56,7 +56,6 @@ defs.h
 monster_scientist.qc
 
 ../../../valve/src/server/player.qc
-../../../valve/src/server/spectator.qc
 ../../../valve/src/server/items.qc
 ../../../valve/src/server/item_longjump.qc
 ../../../valve/src/server/item_suit.qc
@@ -79,7 +78,6 @@ gamerules_madness.qc
 gamerules_slaughter.qc
 gamerules_stealth.qc
 
-../../../valve/src/server/client.qc
 server.qc
 ../../../base/src/server/damage.qc
 ../../../valve/src/server/flashlight.qc
