@@ -79,9 +79,9 @@ gamerules_slaughter.qc
 gamerules_stealth.qc
 
 server.qc
-../../../base/src/server/damage.qc
+../../../valve/src/server/damage.qc
 ../../../valve/src/server/flashlight.qc
-../../../base/src/server/modelevent.qc
+../../../valve/src/server/modelevent.qc
 
 ../../../src/botlib/include.src
 
