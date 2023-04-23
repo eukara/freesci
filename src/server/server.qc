@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2020 Marco Cawthorne <marco@icculus.org>
+ * Copyright (c) 2016-2023 Marco Cawthorne <marco@icculus.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -46,6 +46,7 @@ Game_Worldspawn(void)
 	precache_model("models/player.mdl");
 	precache_model("models/w_weaponbox.mdl");
 	Sound_Precache("player.die");
+	Sound_Precache("player.insane");
 	Sound_Precache("player.fall");
 	Sound_Precache("player.lightfall");
 

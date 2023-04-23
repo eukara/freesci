@@ -10,7 +10,7 @@
 #includelist
 ../../../src/shared/fteextensions.qc
 ../../../src/shared/defs.h
-../../../valve/src/client/defs.h
+defs.h
 ../../../src/client/defs.h
 
 ../../../src/vgui/include.src
@@ -21,7 +21,7 @@
 
 ../../../valve/src/client/damage.qc
 draw.qc
-../../../valve/src/client/init.qc
+init.qc
 ../../../valve/src/client/flashlight.qc
 ../../../valve/src/client/entities.qc
 cmds.qc
@@ -33,12 +33,13 @@ cmds.qc
 ../../../valve/src/client/hud_ammonotify.qc
 ../../../valve/src/client/hud_dmgnotify.qc
 ../../../valve/src/client/hud_itemnotify.qc
-../../../valve/src/client/hud.qc
+hud.qc
 ../../../valve/src/client/hud_weaponselect.qc
 ../../../valve/src/client/scoreboard.qc
 ../../../valve/src/client/modelevent.qc
 
 ../../../src/client/include.src
-../../../valve/src/client/vgui_motd.qc
+vgui_motd.qc
+vgui_chooseteam.qc
 ../../../src/shared/include.src
 #endlist

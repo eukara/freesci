@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2021 Marco Cawthorne <marco@icculus.org>
+ * Copyright (c) 2016-2023 Marco Cawthorne <marco@icculus.org>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -144,6 +144,8 @@ class player:NSClientPlayer
 	PREDICTED_INT(ammo_chainsaw_state)
 	PREDICTED_INT(ammo_hammer_state)
 
+	PREDICTED_FLOAT(sh_insanetime)
+	PREDICTED_FLOAT(sh_insaneactive)
 	PREDICTED_FLOAT(anim_top)
 	PREDICTED_FLOAT(anim_top_time)
 	PREDICTED_FLOAT(anim_top_delay)
@@ -151,6 +153,9 @@ class player:NSClientPlayer
 	PREDICTED_FLOAT(anim_bottom_time)
 
 	virtual void UpdatePlayerAnimation(float);
+	virtual float Physics_MaxSpeed(void);
+	virtual void Physics_InputPreMove(void);
+	virtual void Physics_InputPostMove(void);
 
 #ifdef CLIENT
 	virtual void UpdatePlayerAttachments(bool);
@@ -162,8 +167,6 @@ class player:NSClientPlayer
 	virtual float(entity, float) SendEntity;
 
 	int sh_insanecount;
-	float sh_insanetime;
-	float sh_insaneactive;
 #endif
 };
 
@@ -322,6 +325,8 @@ player::ReceiveEntity(float new, float fl)
 		mode_tempstate = readbyte();
 		ammo_chainsaw_state = readbyte();
 		ammo_hammer_state = readbyte();
+		sh_insanetime = readfloat();
+		sh_insaneactive = readfloat();
 	}
 
 	setorigin(this, origin);
@@ -518,6 +523,10 @@ player::EvaluateEntity(void)
 		SendFlags |= PLAYER_AMMO3;
 	else if (ATTR_CHANGED(ammo_hammer_state))
 		SendFlags |= PLAYER_AMMO3;
+	else if (ATTR_CHANGED(sh_insanetime))
+		SendFlags |= PLAYER_AMMO3;
+	else if (ATTR_CHANGED(sh_insaneactive))
+		SendFlags |= PLAYER_AMMO3;
 
 	SAVE_STATE(glock_mag)
 	SAVE_STATE(mp5_mag)
@@ -623,6 +632,8 @@ player::SendEntity(entity ePEnt, float flChanged)
 		WriteByte(MSG_ENTITY, mode_tempstate);
 		WriteByte(MSG_ENTITY, ammo_chainsaw_state);
 		WriteByte(MSG_ENTITY, ammo_hammer_state);
+		WriteFloat(MSG_ENTITY, sh_insanetime);
+		WriteFloat(MSG_ENTITY, sh_insaneactive);
 	}
 
 	return (1);

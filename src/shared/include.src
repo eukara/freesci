@@ -3,6 +3,7 @@
 ../../../valve/src/shared/events.h
 ../../../valve/src/shared/flags.h
 player.qc
+pmove.qc
 ../../../valve/src/shared/weapon_common.h
 ../../../valve/src/shared/animations.h
 ../../../valve/src/shared/animations.qc

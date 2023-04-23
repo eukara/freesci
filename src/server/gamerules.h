@@ -56,7 +56,11 @@ class SHTeamRules:HLGameRules
 	virtual bool(void) IsTeamplay;
 	virtual void(void) AddTeam1Kill;
 	virtual void(void) AddTeam2Kill;
+	virtual void(void) RemoveTeam1Kill;
+	virtual void(void) RemoveTeam2Kill;
+	virtual void(void) RegisterSciDeathHuntTeam;
 	virtual void(NSClientPlayer, entity) ScientistKill;
+	virtual void(NSClientPlayer, entity) ScientistKillFear;
 	virtual void(void) InitPostEnts;
 };
 
@@ -66,8 +70,6 @@ class SHTeamRules:HLGameRules
 class SHGameHunt:SHTeamRules
 {
 	void(void) SHGameHunt;
-
-	virtual void(void) RegisterSciDeath;
 };
 
 /* Stealth Hunting (1):
@@ -75,7 +77,6 @@ class SHGameHunt:SHTeamRules
 */
 class SHGameStealth:SHTeamRules
 {
-
 	void(void) SHGameStealth;
 };
 
@@ -84,7 +85,6 @@ class SHGameStealth:SHTeamRules
 */
 class SHGameSlaughter:HLGameRules
 {
-
 	void(void) SHGameSlaughter;
 };
 
@@ -93,7 +93,6 @@ class SHGameSlaughter:HLGameRules
 */
 class SHGameFear:HLGameRules
 {
-
 	void(void) SHGameFear;
 };
 

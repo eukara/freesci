@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2016-2020 Marco Cawthorne <marco@icculus.org>
+ * Copyright (c) 2016-2023 Marco Cawthorne <marco@icculus.org>
+ * Copyright (c) 2016-2023 Gethyn ThomasQuail <gethyn@vera-visions.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
@@ -45,6 +46,9 @@ HLGameRules::IsMultiplayer(void)
 void
 HLGameRules::PlayerDeath(NSClientPlayer pl)
 {
+
+	player sh_pl = (player)pl;
+
 	/* obituary networking */
 	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
 	WriteByte(MSG_MULTICAST, EV_OBITUARY);
@@ -71,10 +75,14 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 			g_dmg_eAttacker.frags++;
 	}
 
+
 	pl.Death();
 	pl.takedamage = DAMAGE_NO;
 	pl.gflags &= ~GF_FLASHLIGHT;
 	pl.gflags &= ~GF_EGONBEAM;
+	pl.gflags &= ~GF_MADNESS;
+
+	sh_pl.sh_insaneactive = 0.0f;
 
 	pl.think = PutClientInServer;
 	pl.nextthink = time + 4.0f;
@@ -239,14 +247,20 @@ HLGameRules::PlayerPostFrame(NSClientPlayer pp)
 
 	pl.sh_insaneactive = bound(0.0f, pl.sh_insaneactive - frametime, pl.sh_insaneactive);
 
-	if (pl.sh_insaneactive > 0.0f)
-		pl.gflags |= GF_MADNESS;
-	else {
+	/* Apply insanity flag to players, and players only */
+	if (pl.sh_insaneactive > 0.0f) {
+			if not (pl.gflags & GF_MADNESS) {
+				pl.gflags |= GF_MADNESS;
+				bprint(PRINT_HIGH, sprintf("%s is going insane!\n", pl.netname));
+				Sound_Play(pl, CHAN_AUTO, "player.insane");
+			}
+	} else {
 		if (pl.gflags & GF_MADNESS) {
-			bprint(PRINT_CHAT, sprintf("%s is no longer insane!\n", pl.netname));
+			bprint(PRINT_HIGH, sprintf("%s is no longer insane!\n", pl.netname));
 		}
 		pl.gflags &= ~GF_MADNESS;
 	}
+
 }
 
 void
@@ -275,10 +289,12 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 	msg_entity = world;
 	multicast([0,0,0], MULTICAST_ALL);
 
+	/* give players a frag per scientist they kill */
 	pl.frags++;
 
-	/*if (g_weapons[g_dmg_iWeapon].slot != 0)
-		return;*/
+	/* only reward melee frags for insanity, otherwise it's a bit OP */
+	if (g_weapons[g_dmg_iWeapon].slot != 0)
+		return;
 
 	/* if this is our first kill in a while, or in the timer... */
 	if (pl.sh_insanecount == 0 || pl.sh_insanetime > time) {
@@ -288,11 +304,15 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 	}
 
 	if (pl.sh_insanecount >= autocvar_sh_insanity) {
-		if (pl.sh_insaneactive <= 0.0f)
-			bprint(PRINT_CHAT, sprintf("%s is going insane!\n", pl.netname));
-
-		pl.sh_insaneactive += 3.0f;
+		/* always start with a 30 second cooldown 
+		 * otherwise give 3 seconds per frag */
+		if (pl.gflags & GF_MADNESS) {
+			pl.sh_insaneactive += 3.0f;
+		} else {
+			pl.sh_insaneactive += 30.0f;
+		}
 		
+		/* clamp our timer */
 		if (pl.sh_insaneactive > 60)
 			pl.sh_insaneactive = 60;
 	}
@@ -403,6 +423,18 @@ SHTeamRules::ScientistKill(NSClientPlayer cl, entity sci)
 }
 
 void
+SHTeamRules::ScientistKillFear(NSClientPlayer cl, entity sci)
+{
+	super::ScientistKill(cl, sci);
+
+	if (cl.team == 2)
+		RemoveTeam2Kill();
+	else if (cl.team == 1)
+		AddTeam1Kill();
+}
+
+
+void
 SHTeamRules::AddTeam1Kill(void)
 {
 	m_iKillsTeam1++;
@@ -414,6 +446,48 @@ SHTeamRules::AddTeam2Kill(void)
 {
 	m_iKillsTeam2++;
 	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
+}
+
+void
+SHTeamRules::RemoveTeam1Kill(void)
+{
+	m_iKillsTeam1--;
+	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
+}
+
+void
+SHTeamRules::RemoveTeam2Kill(void)
+{
+	m_iKillsTeam2--;
+	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
+}
+
+void
+SHTeamRules::RegisterSciDeathHuntTeam(void)
+{
+	super::RegisterSciDeath();
+
+	if (m_iScientistsAlive > 0)
+		return;
+
+	switch (g_chosen_mode) {
+	case SHMODE_STANDARD:
+		if (m_iKillsTeam1 > m_iKillsTeam2) {
+			m_iScoreTeam1++;
+			env_message_broadcast("Red team has won!");
+		} else if (m_iKillsTeam1 > m_iKillsTeam2) {
+			m_iScoreTeam2++;
+			env_message_broadcast("Blue team has won!");
+		} else {
+			env_message_broadcast("Both teams are tied!");
+		}
+
+		forceinfokey(world, "teamscore_1", sprintf("%i", m_iScoreTeam1));
+		forceinfokey(world, "teamscore_2", sprintf("%i", m_iScoreTeam2));
+		think = RestartRound;
+		nextthink = time + 5.0f;
+		break;
+	}
 }
 
 void
