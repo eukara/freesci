@@ -17,9 +17,9 @@
 void
 Game_InitRules(void)
 {
-	g_chosen_mode = autocvar_sv_realistic;
+	g_chosen_mode = autocvar_sh_realistic;
 
-	switch (autocvar_sv_realistic) {
+	switch (autocvar_sh_realistic) {
 	case SHMODE_STANDARD:
 		g_grMode = spawn(SHGameHunt);
 		break;

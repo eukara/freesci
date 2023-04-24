@@ -56,12 +56,14 @@ class SHTeamRules:HLGameRules
 	virtual bool(void) IsTeamplay;
 	virtual void(void) AddTeam1Kill;
 	virtual void(void) AddTeam2Kill;
-	virtual void(void) RemoveTeam1Kill;
-	virtual void(void) RemoveTeam2Kill;
-	virtual void(void) RegisterSciDeathHuntTeam;
+	virtual void(void) RegisterSciDeath;
 	virtual void(NSClientPlayer, entity) ScientistKill;
-	virtual void(NSClientPlayer, entity) ScientistKillFear;
 	virtual void(void) InitPostEnts;
+};
+
+class SHRules:HLGameRules
+{
+	virtual void(void) RegisterSciDeath;
 };
 
 /* Standard Hunting (0):
@@ -73,7 +75,7 @@ class SHGameHunt:SHTeamRules
 };
 
 /* Stealth Hunting (1):
-	Round-based competitive killing where scientists stand or walk around, but will run in fear if they see the player. Scientists don't respawn. Similar to deer hunting.
+	Round-based competitive killing where scientists stand or walk around, but will run in fear if they see the player. Similar to deer hunting. Scientists don't respawn.
 */
 class SHGameStealth:SHTeamRules
 {
@@ -81,7 +83,7 @@ class SHGameStealth:SHTeamRules
 };
 
 /* Traditional Slaughter (2):
-	Casual killing where scientists treat the player same as in Single Player. Scientists respawn. I suggest we just leave teams out on this one?
+	Casual killing where scientists behave the same as they were in Half-Life. Scientists respawn.
 */
 class SHGameSlaughter:HLGameRules
 {
@@ -101,8 +103,15 @@ class SHGameFear:HLGameRules
 */
 class SHGameMadness:HLGameRules
 {
-
 	void(void) SHGameMadness;
+};
+
+/* Invasion (5):
+	Unique new round-based gamemode where scientists attack similar to madness but work together to kill everyone else. If players eleminate all scientists, then they win the round and have to do it all over again. Heavy WIP. Scientists and players don't respawn.
+*/
+class SHGameInvasion:SHRules
+{
+	void(void) SHGameInvasion;
 };
 
 typedef enum
@@ -111,8 +120,9 @@ typedef enum
 	SHMODE_STEALTH,
 	SHMODE_SLAUGHTER,
 	SHMODE_LIVEINFEAR,
-	SHMODE_MADNESS
+	SHMODE_MADNESS,
+	SHMODE_INVASION
 } shmode_e;
 
-var shmode_e autocvar_sv_realistic = SHMODE_SLAUGHTER;
+var shmode_e autocvar_sh_realistic = SHMODE_SLAUGHTER;
 var shmode_e g_chosen_mode;
