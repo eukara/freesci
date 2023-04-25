@@ -8,7 +8,12 @@ The original mod was created by Rich Whitehouse.
 I'm just nostalgic for it, so I recoded the important bits to use with
 FreeHL and Nuclide.
 
-It's not complete (yet).
+It's mostly complete, currently missing:
+
+- Live in Fear (Gamemode)
+- Arsenal file loading
+- Some special CVARs (there was a lot of them)
+- A few minor details (walking scientists in Stealth Hunting)
 
 ![Preview 1](img/preview1.jpg)
 ![Preview 2](img/preview2.jpg)
@@ -41,7 +46,7 @@ We've had people ask in the oddest of places for help, please don't do that.
 ## License
 ISC License
 
-Copyright (c) 2016-2021 Marco Hladik <marco@icculus.org>
+Copyright (c) 2016-2023 Marco Hladik <marco@icculus.org>
 
 Permission to use, copy, modify, and distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
