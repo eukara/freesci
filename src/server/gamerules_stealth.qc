@@ -2,4 +2,5 @@ void
 SHGameStealth::SHGameStealth(void)
 {
 
+
 }

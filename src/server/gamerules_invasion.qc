@@ -1,0 +1,6 @@
+void
+SHGameInvasion::SHGameInvasion(void)
+{
+
+
+}
