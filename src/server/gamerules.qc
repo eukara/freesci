@@ -15,8 +15,6 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-var int autocvar_sh_insanity = 10;
-
 void
 HLGameRules::RestartRound(void)
 {
@@ -281,14 +279,16 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 {
 	player pl = (player)pp;
 	/* obituary networking */
-	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
-	WriteByte(MSG_MULTICAST, EV_OBITUARY);
-	WriteString(MSG_MULTICAST, pl.netname);
-	WriteString(MSG_MULTICAST, sci.netname);
-	WriteByte(MSG_MULTICAST, g_dmg_iWeapon);
-	WriteByte(MSG_MULTICAST, 0);
-	msg_entity = world;
-	multicast([0,0,0], MULTICAST_ALL);
+	if (cvar("sh_announcescideath") == 1) {
+		WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
+		WriteByte(MSG_MULTICAST, EV_OBITUARY);
+		WriteString(MSG_MULTICAST, pl.netname);
+		WriteString(MSG_MULTICAST, sci.netname);
+		WriteByte(MSG_MULTICAST, g_dmg_iWeapon);
+		WriteByte(MSG_MULTICAST, 0);
+		msg_entity = world;
+		multicast([0,0,0], MULTICAST_ALL);
+	}
 
 	/* give players a frag per scientist they kill */
 	pl.frags++;

@@ -137,5 +137,11 @@ var int autocvar_sh_scialert = FALSE;
 /* default speed for scientists */
 var int autocvar_sh_scispeed = 40;
 
+/* enable scientist obituaries */
+var int autocvar_sh_announcescideath = 1;
+
+/* default kills required for insanity */
+var int autocvar_sh_insanity = 5;
+
 /* an override for sh_scimax */
 var int autocvarsh_scimax_override = 0;
