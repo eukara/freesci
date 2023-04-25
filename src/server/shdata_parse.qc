@@ -17,15 +17,12 @@
 /* If only origin parameters are applied, make something up */
 var int autocvar_sh_sciyaw = TRUE;
 
-/* Limit the amount of scientists spawned */
-var int autocvar_sh_scimax = 30;
-
 void
 SHData_SpawnScientist(void)
 {
 	static int slimit = 0;
-	if (autocvar_sh_scimax) {
-		if (slimit >= autocvar_sh_scimax) {
+	if (cvar("sh_scimax")) {
+		if (slimit >= cvar("sh_scimax")) {
 			dprint("shdata: scientist limit hit. ignored\n");
 			remove(self);
 			return;

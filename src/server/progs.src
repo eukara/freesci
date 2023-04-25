@@ -74,6 +74,7 @@ shdata_parse.qc
 gamerules.qc
 gamerules_fear.qc
 gamerules_hunt.qc
+gamerules_invasion.qc
 gamerules_madness.qc
 gamerules_slaughter.qc
 gamerules_stealth.qc
