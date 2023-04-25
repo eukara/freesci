@@ -22,10 +22,6 @@ Scientist
 
 */
 
-var int autocvar_sh_scialert = FALSE;
-var int autocvar_sh_scispeed = 40;
-var int autocvar_sh_sciattack = FALSE;
-
 enum
 {
 	SCIA_WALK,
@@ -77,6 +73,13 @@ class monster_scientist:NSTalkMonster
 {
 	void(void) monster_scientist;
 
+	/* override */
+	virtual void(void) SeeThink;
+	virtual float(void) GetWalkSpeed;
+	virtual float(void) GetChaseSpeed;
+	virtual float(void) GetRunSpeed;
+	virtual void(void) PanicFrame;
+
 	virtual void(void) Spawned;
 	virtual void(void) Respawn;
 	virtual void(void) Pain;
@@ -95,11 +98,66 @@ class monster_scientist:NSTalkMonster
 	virtual void(string, string) SpawnKey;
 };
 
+
+/* Players scare scientists if they see them in Stealth Hunting */
+void
+monster_scientist::SeeThink(void)
+{
+	/* let's call the original monster SeeThink function */
+	super::SeeThink();
+
+	/* don't do anything if they're already scared */
+	if (m_iFlags & MONSTER_FEAR)
+	return;
+
+	/* don't do anything if we're in the wrong gamemode */
+	if not (g_chosen_mode == SHMODE_STEALTH)
+	return;
+
+	/* iterate over all players */
+	for (entity e = world; (e = find(e, ::classname, "player"));) {
+		/* is that player visible? then scare the scientist! */
+		if (Visible(e)) {
+			m_iFlags |= MONSTER_FEAR;
+			return;
+		}
+	}
+}
+
+/* scientist's speed is controlled via cvar */
+void
+monster_scientist::PanicFrame(void)
+{
+	super::PanicFrame();
+	input_movevalues = [6 * cvar("sh_scispeed"), 0, 0];
+}
+
+float
+monster_scientist::GetWalkSpeed(void)
+{
+	super::GetWalkSpeed();
+	return 1.6 * cvar("sh_scispeed");
+}
+
+float
+monster_scientist::GetChaseSpeed(void)
+{
+	super:: GetChaseSpeed();
+	return 6 * cvar("sh_scispeed");
+}
+
+float
+monster_scientist::GetRunSpeed(void)
+{
+	super::GetRunSpeed();
+	return 3.5 * cvar("sh_scispeed");
+}
+
+
 void
 monster_scientist::FallNoise(void)
 {
-	float r = floor(random(3,8)) + 1.0f;
-	sound(this, CHAN_VOICE, sprintf("scientist/scream%02d.wav", r), 1.0, ATTN_NORM);
+	Sound_Speak(this, "monster_scientist.fall");
 }
 
 int
@@ -111,6 +169,7 @@ monster_scientist::AttackMelee(void)
 
 	float r = random();
 
+	/* make them say something extremely fitting, thanks eukara */
 	if (r < 0.33)
 		Sentence("!SC_CUREA");
 	else if (r < 0.66)
@@ -119,24 +178,70 @@ monster_scientist::AttackMelee(void)
 		Sentence("!SC_CUREC");
 
 	/* functional */
-	think = AttackNeedle;
-	nextthink = 0.25f;
+	ScheduleThink(AttackNeedle, 0.25f);
 	return (1);
+}
+
+/* set these globals for scientist's poison
+ * a little messy but it works */
+.NSTimer poisonTimer;
+.entity poisonSource;
+
+/* a function for poison that slowly kills the target */
+static void
+monster_scientist_NeedleAttack(entity target)
+{
+	bool isDead = false;
+	Damage_Apply(target, target.poisonSource, 10, 0, DMG_POISON);
+
+	/* since corpses have "health" do an extra check */
+	if (target.health <= 0)
+		isDead = true;
+	if (target.solid == SOLID_CORPSE)
+		isDead = true;
+
+	if (isDead) {
+		/* the attacker laughs at a sucessful kill if they're not dead
+		 * TODO Sound_Speak needs to have an override speach option */
+		if (target.poisonSource.solid != SOLID_CORPSE) {
+			Sound_Speak(target.poisonSource, "monster_scientist.laugh");
+		}
+		target.poisonTimer.StopTimer();
+	}
 }
 
 void
 monster_scientist::AttackNeedle(void)
 {
+	/* implement our special function so we know who are we attacking */
+	static void AttackNeedle_PoisonDamage(void) {
+		monster_scientist_NeedleAttack(self);
+	}
+
+	/* look for our victim */
 	traceline(origin, m_eEnemy.origin, FALSE, this);
 
+	/* if the entity can't take damage, don't bother */
 	if (trace_fraction >= 1.0 || trace_ent.takedamage != DAMAGE_YES) {
 		return;
 	}
 
-	Damage_Apply(trace_ent, this, 25, 0, 0);
+	/* set the timer for the poison
+	 * flag the vitcim so they aren't attacked again (unless Invasion) */
+	if not (g_chosen_mode == SHMODE_INVASION) {
+		trace_ent.flags |= FL_NOTARGET;
+	}
+	trace_ent.poisonSource = this;
+	trace_ent.poisonTimer = trace_ent.poisonTimer.ScheduleTimer(trace_ent, AttackNeedle_PoisonDamage, 3.0f, true);
+
+	/* apply our poison attack to the victim */
+	monster_scientist_NeedleAttack(trace_ent);
+	/* visual */
 	AnimPlay(30);
+
 }
 
+/* TODO someday these will use the ACT system */
 int
 monster_scientist::AnimIdle(void)
 {
@@ -158,6 +263,10 @@ monster_scientist::AnimRun(void)
 void
 monster_scientist::TalkPanic(void)
 {
+	/* it's annoying and prevents the laugh in these gamemodes */
+	if (g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION)
+	return;
+
 	int r = floor(random(0,30));
 
 	switch (r) {
@@ -225,7 +334,7 @@ monster_scientist::PlayerUse(void)
 	}
 
 	if (m_iFlags & MONSTER_FEAR) {
-		bprint(PRINT_HIGH, sprintf("I'm not following you evil person!"));
+		bprint(PRINT_HIGH, sprintf("I'm not following you evil person!\n"));
 		return;
 	}
 
@@ -261,6 +370,7 @@ monster_scientist::Death(void)
 	HLGameRules rules = (HLGameRules)g_grMode;
 
 	/* upset everyone */
+	if not (g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION)
 	StartleAllies();
 
 	if (IsAlive() == true) {
@@ -281,11 +391,10 @@ monster_scientist::Death(void)
 	}
 
 	/* will not respawn by themselves in these modes */
-	if (g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_STEALTH)
+	if (g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_STEALTH || g_chosen_mode == SHMODE_INVASION)
 		return;
 
-	think = Respawn;
-	nextthink = time + 10.0f;
+	ScheduleThink(Respawn, 10.0f);
 }
 
 void
@@ -293,10 +402,30 @@ monster_scientist::Respawn(void)
 {
 	HLGameRules rules = (HLGameRules)g_grMode;
 
-	super::Respawn();
-	m_iFlags |= MONSTER_CANFOLLOW;
+	/* don't spawn if we're hitting scimax */
+	if (serverkeyfloat("sci_count") >= serverkeyfloat("sv_scimax"))
+		return;
 
-	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_STEALTH) {
+	super::Respawn();
+
+	/* unset notarget for attacking scientists
+	 * TODO in the future we shouldn't have to mess with flags this way */
+	flags &= ~FL_NOTARGET;
+
+	if not (g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION)
+	m_iFlags |= MONSTER_CANFOLLOW;
+	
+	/* attack EVERYONE */
+	if (g_chosen_mode == SHMODE_MADNESS)
+		m_iAlliance = MAL_ROGUE;
+
+	/* attack anyone but aliens */
+	if (g_chosen_mode == SHMODE_INVASION)
+		m_iAlliance = MAL_ALIEN;
+
+	/* scientists are always afraid in standard hunting
+	 * and scialert mode */ 
+	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD) {
 		m_iFlags |= MONSTER_FEAR;
 	}
 
@@ -323,6 +452,7 @@ monster_scientist::Respawn(void)
 			netname = "Slick";
 	}
 
+	/* recount to update sciscore and so on */
 	rules.CountScientists();
 }
 
@@ -381,6 +511,8 @@ monster_scientist::Spawned(void)
 
 	Sound_Precache("monster_scientist.die");
 	Sound_Precache("monster_scientist.pain");
+	Sound_Precache("monster_scientist.laugh");
+	Sound_Precache("monster_scientist.fall");
 
 	/* has the body not been overriden, etc. choose a character for us */
 	if (m_iBody == -1) {
@@ -411,10 +543,4 @@ void
 monster_scientist::monster_scientist(void)
 {
 
-	/* TODO they still need to attack each other for madness */
-	if (g_chosen_mode == SHMODE_MADNESS)
-		m_iAlliance = MAL_ALIEN;
-
-	if (autocvar_sh_sciattack)
-		m_iAlliance = MAL_ALIEN;
 }

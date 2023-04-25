@@ -1,0 +1,20 @@
+monster_scientist.laugh
+{
+	sample sh/hide_laugh.wav
+}
+
+monster_scientist.tele
+{
+	sample sh/telesci.wav
+}
+
+monster_scientist.fall
+{
+	sample scientist/scream1.wav
+	sample scientist/scream2.wav
+	sample scientist/scream3.wav
+	sample scientist/scream4.wav
+	sample scientist/scream5.wav
+	sample scientist/scream6.wav
+	sample scientist/scream7.wav
+}
