@@ -14,18 +14,35 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+void VGUI_ChooseTeam(void);
+
 int
 ClientGame_ConsoleCommand(void)
 {
 	switch(argv(0)) {
-	case "+sciboard":
-		g_sciboard = true;
+	case "+sciscore":
+		g_sciscore = true;
 		break;
-	case "-sciboard":
-		g_sciboard = false;
+	case "-sciscore":
+		g_sciscore = false;
 		break;
 	default:
 		return (0);
 	}
 	return (1);
+}
+
+void
+CMD_ChooseTeam(void)
+{
+	if (serverkeyfloat("sv_playerslots") <= 1)
+		return;
+
+		if (serverkeyfloat("teams") > 1)
+
+	/* handle both VGUI and text menus */
+//	if (ClientGame_IsUsingVGUI())
+		VGUI_ChooseTeam();
+//	else
+//		Textmenu_Toggle("TEAM_SELECT");
 }

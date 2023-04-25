@@ -14,7 +14,7 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 */
 
-var bool g_sciboard = false;
+var bool g_sciscore = false;
 
 void
 ClientGame_PreDraw(void) 
@@ -23,7 +23,7 @@ ClientGame_PreDraw(void)
 }
 
 void
-SH_DrawSciBoard(void)
+SH_DrawSciScore(void)
 {
 	string line;
 	vector pos;
@@ -58,6 +58,6 @@ SH_DrawSciBoard(void)
 void
 ClientGame_PostDraw(void)
 {
-	if (g_sciboard)
-		SH_DrawSciBoard();
+	if (g_sciscore)
+		SH_DrawSciScore();
 }
