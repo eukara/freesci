@@ -63,6 +63,7 @@ class SHTeamRules:HLGameRules
 
 class SHRules:HLGameRules
 {
+	void(void) SHRules;
 	virtual void(void) RegisterSciDeath;
 };
 
@@ -124,5 +125,17 @@ typedef enum
 	SHMODE_INVASION
 } shmode_e;
 
+/* give our gamemode cvar a default */
 var shmode_e autocvar_sh_realistic = SHMODE_SLAUGHTER;
 var shmode_e g_chosen_mode;
+
+/* limit the amount of scientists that can spawn by default */
+var int autocvar_sh_scimax = 5;
+
+var int autocvar_sh_scialert = FALSE;
+
+/* default speed for scientists */
+var int autocvar_sh_scispeed = 40;
+
+/* an override for sh_scimax */
+var int autocvarsh_scimax_override = 0;

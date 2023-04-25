@@ -81,6 +81,7 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 	pl.gflags &= ~GF_FLASHLIGHT;
 	pl.gflags &= ~GF_EGONBEAM;
 	pl.gflags &= ~GF_MADNESS;
+	pl.poisonTimer.StopTimer();
 
 	sh_pl.sh_insaneactive = 0.0f;
 
@@ -372,6 +373,24 @@ HLGameRules::InitPostEnts(void)
 void
 HLGameRules::HLGameRules(void)
 {
+	/* HACK we'll set this here for now to ensure we don't
+	 * have a race condition */
+	forceinfokey(world, "sci_count", "0");
+
+	/* if the previous map set this value but the current doesn't
+	 * then set the default */
+	cvar_set("sh_scispeed","40");
+
+	/* just re-read this to prevent funny beahviour */
+	readcmd(sprintf("exec maps/%s.cfg\n", mapname));
+
+	/* always broadcast how many max scientists the server has set 
+	 * but allow an override for server admins */
+	if (cvar("sh_scimax_override") > 0) {
+		forceinfokey(world, "sv_scimax", cvar_string("sh_scimax_override"));
+	} else {
+		forceinfokey(world, "sv_scimax", cvar_string("sh_scimax"));
+	}
 }
 
 /* TEAMPLAY ONLY LOGIC */
@@ -393,6 +412,8 @@ SHTeamRules::PlayerSpawn(NSClientPlayer cl)
 	if (cl.team != 0)
 		return;
 
+	/* auto-balance 
+	 * TODO make this a command instead */
 	for (entity e = world; (e = find( e, ::classname, "player"));) {
 		if (e == cl)
 			continue;
@@ -423,18 +444,6 @@ SHTeamRules::ScientistKill(NSClientPlayer cl, entity sci)
 }
 
 void
-SHTeamRules::ScientistKillFear(NSClientPlayer cl, entity sci)
-{
-	super::ScientistKill(cl, sci);
-
-	if (cl.team == 2)
-		RemoveTeam2Kill();
-	else if (cl.team == 1)
-		AddTeam1Kill();
-}
-
-
-void
 SHTeamRules::AddTeam1Kill(void)
 {
 	m_iKillsTeam1++;
@@ -448,46 +457,31 @@ SHTeamRules::AddTeam2Kill(void)
 	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
 }
 
+/* teamplay scientist death tracking */
 void
-SHTeamRules::RemoveTeam1Kill(void)
-{
-	m_iKillsTeam1--;
-	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
-}
-
-void
-SHTeamRules::RemoveTeam2Kill(void)
-{
-	m_iKillsTeam2--;
-	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
-}
-
-void
-SHTeamRules::RegisterSciDeathHuntTeam(void)
+SHTeamRules::RegisterSciDeath(void)
 {
 	super::RegisterSciDeath();
 
+	/* if no scientists are left then stop */
 	if (m_iScientistsAlive > 0)
 		return;
 
-	switch (g_chosen_mode) {
-	case SHMODE_STANDARD:
-		if (m_iKillsTeam1 > m_iKillsTeam2) {
-			m_iScoreTeam1++;
-			env_message_broadcast("Red team has won!");
-		} else if (m_iKillsTeam1 > m_iKillsTeam2) {
-			m_iScoreTeam2++;
-			env_message_broadcast("Blue team has won!");
-		} else {
-			env_message_broadcast("Both teams are tied!");
-		}
-
-		forceinfokey(world, "teamscore_1", sprintf("%i", m_iScoreTeam1));
-		forceinfokey(world, "teamscore_2", sprintf("%i", m_iScoreTeam2));
-		think = RestartRound;
-		nextthink = time + 5.0f;
-		break;
+	/* award the kill to the appropiate team */
+	if (m_iKillsTeam1 > m_iKillsTeam2) {
+		m_iScoreTeam1++;
+		env_message_broadcast("Red team has won!");
+	} else if (m_iKillsTeam1 > m_iKillsTeam2) {
+		m_iScoreTeam2++;
+		env_message_broadcast("Blue team has won!");
+	} else {
+		env_message_broadcast("Both teams are tied!");
 	}
+
+	forceinfokey(world, "teamscore_1", sprintf("%i", m_iScoreTeam1));
+	forceinfokey(world, "teamscore_2", sprintf("%i", m_iScoreTeam2));
+	think = RestartRound;
+	nextthink = time + 5.0f;
 }
 
 void
@@ -518,4 +512,26 @@ SHTeamRules::SHTeamRules(void)
 {
 	m_iKillsTeam1 = 0;
 	m_iKillsTeam2 = 0;
+}
+
+/* invasion scientist death tracking */
+void
+SHRules::RegisterSciDeath(void)
+{
+	super::RegisterSciDeath();
+
+	/* if no scientists are left then we win */
+	if (m_iScientistsAlive > 0)
+		return;
+
+	env_message_broadcast("You have survived!\nCan you do it again?");
+
+	think = RestartRound;
+	nextthink = time + 5.0f;
+}
+
+void
+SHRules::SHRules(void)
+{
+
 }

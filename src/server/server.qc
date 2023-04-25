@@ -35,6 +35,9 @@ Game_InitRules(void)
 	case SHMODE_MADNESS:
 		g_grMode = spawn(SHGameMadness);
 		break;
+	case SHMODE_INVASION:
+		g_grMode = spawn(SHGameInvasion);
+		break;
 	default:
 		g_grMode = spawn(HLGameRules);
 	}
