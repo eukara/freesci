@@ -19,12 +19,19 @@ void VGUI_ChooseTeam(void);
 int
 ClientGame_ConsoleCommand(void)
 {
+	
 	switch(argv(0)) {
 	case "+sciscore":
+		if (cvar("sh_announcescinum") == 1)
 		g_sciscore = true;
 		break;
 	case "-sciscore":
+		if (cvar("sh_announcescinum") == 1)
 		g_sciscore = false;
+		break;
+	case "changeteam":
+		if (cvar("sh_allowteamchange") == 1)
+		CMD_ChooseTeam();
 		break;
 	default:
 		return (0);
@@ -40,9 +47,6 @@ CMD_ChooseTeam(void)
 
 		if (serverkeyfloat("teams") > 1)
 
-	/* handle both VGUI and text menus */
-//	if (ClientGame_IsUsingVGUI())
 		VGUI_ChooseTeam();
-//	else
-//		Textmenu_Toggle("TEAM_SELECT");
+
 }
