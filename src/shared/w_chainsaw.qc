@@ -111,7 +111,10 @@ void w_chainsaw_primary(player pl)
 			Damage_Apply(trace_ent, self, dmg, WEAPON_CHAINSAW, DMG_BLUNT);
 			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.hitflesh");
 		} else {
+			/* well, this is in the advanced options */
+			if (cvar("sh_chainspark") != 1)
 			FX_Spark(trace_endpos, trace_plane_normal);
+
 			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.hit");
 		}
 		pl.w_attack_next = 0.1f;
