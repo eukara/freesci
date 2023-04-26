@@ -164,8 +164,10 @@ int
 monster_scientist::AttackMelee(void)
 {
 	/* visual */
-	AnimPlay(28);
+	AnimPlay(61);
 	m_flAttackThink = m_flAnimTime;
+	/* TODO set needle sub-model
+	SetBody(this, "", "geomset 0 5\n"); */
 
 	float r = random();
 
@@ -178,7 +180,7 @@ monster_scientist::AttackMelee(void)
 		Sentence("!SC_CUREC");
 
 	/* functional */
-	ScheduleThink(AttackNeedle, 0.25f);
+	ScheduleThink(AttackNeedle, 1.0f);
 	return (1);
 }
 
@@ -186,12 +188,25 @@ monster_scientist::AttackMelee(void)
  * a little messy but it works */
 .NSTimer poisonTimer;
 .entity poisonSource;
+.float OldTargetHealth;
 
 /* a function for poison that slowly kills the target */
 static void
 monster_scientist_NeedleAttack(entity target)
 {
 	bool isDead = false;
+	bool isHealed = false;
+
+	/* if increase in target's health, then they are cured */
+	if (target.OldTargetHealth > 0) {
+		if (target.OldTargetHealth < target.health) {
+			isDead = true; // misleading but less code
+			isHealed = true;
+			target.flags &= ~FL_NOTARGET;
+		}
+	}
+
+	if (isHealed != true)
 	Damage_Apply(target, target.poisonSource, 10, 0, DMG_POISON);
 
 	/* since corpses have "health" do an extra check */
@@ -201,13 +216,16 @@ monster_scientist_NeedleAttack(entity target)
 		isDead = true;
 
 	if (isDead) {
-		/* the attacker laughs at a sucessful kill if they're not dead
-		 * TODO Sound_Speak needs to have an override speach option */
-		if (target.poisonSource.solid != SOLID_CORPSE) {
+		/* the attacker laughs at a sucessful kill if they're not dead */
+		if (target.poisonSource.solid != SOLID_CORPSE)
+			if (isHealed == false) // don't laugh if the victim is cured
 			Sound_Speak(target.poisonSource, "monster_scientist.laugh");
-		}
+
 		target.poisonTimer.StopTimer();
 	}
+
+	/* update our health value for next cycle */
+	target.OldTargetHealth = target.health;
 }
 
 void
@@ -221,24 +239,25 @@ monster_scientist::AttackNeedle(void)
 	/* look for our victim */
 	traceline(origin, m_eEnemy.origin, FALSE, this);
 
+
 	/* if the entity can't take damage, don't bother */
 	if (trace_fraction >= 1.0 || trace_ent.takedamage != DAMAGE_YES) {
 		return;
 	}
 
-	/* set the timer for the poison
-	 * flag the vitcim so they aren't attacked again (unless Invasion) */
-	if not (g_chosen_mode == SHMODE_INVASION) {
-		trace_ent.flags |= FL_NOTARGET;
+	/* trace to see if the target is in front of us, if not then fail attack */
+	if (vlen(origin - m_eEnemy.origin) < 96) {
+		/* set the timer for the poison
+		 * flag the vitcim so they aren't attacked again (unless Invasion) */
+		if not (g_chosen_mode == SHMODE_INVASION) {
+			trace_ent.flags |= FL_NOTARGET;
+		}
+		trace_ent.poisonSource = this;
+		trace_ent.poisonTimer = trace_ent.poisonTimer.ScheduleTimer(trace_ent, AttackNeedle_PoisonDamage, 3.0f, true);
+
+		/* apply our poison attack to the victim */
+		monster_scientist_NeedleAttack(trace_ent);
 	}
-	trace_ent.poisonSource = this;
-	trace_ent.poisonTimer = trace_ent.poisonTimer.ScheduleTimer(trace_ent, AttackNeedle_PoisonDamage, 3.0f, true);
-
-	/* apply our poison attack to the victim */
-	monster_scientist_NeedleAttack(trace_ent);
-	/* visual */
-	AnimPlay(30);
-
 }
 
 /* TODO someday these will use the ACT system */
@@ -425,7 +444,7 @@ monster_scientist::Respawn(void)
 
 	/* scientists are always afraid in standard hunting
 	 * and scialert mode */ 
-	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD) {
+	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION) {
 		m_iFlags |= MONSTER_FEAR;
 	}
 
