@@ -16,11 +16,13 @@ weapon_chainsaw.draw
 weapon_chainsaw.hit
 {
 	sample sh/chainsaw_cutinto.wav
+	shakes 0.5
 }
 
 weapon_chainsaw.hitflesh
 {
 	sample sh/chainsaw_cutintoflesh.wav
+	shakes 0.5
 }
 
 weapon_chainsaw.idle
