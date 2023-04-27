@@ -25,31 +25,19 @@ void
 ClientGame_Init(float apilevel, string enginename, float engineversion)
 {
 	Obituary_Init();
+
 	registercommand("+sciscore");
 	registercommand("-sciscore");
-	registercommand("chooseteam");
-}
-
-bool
-ClientGame_IsUsingVGUI(void)
-{
-	/* FTE has a bug with _ infokeys, so we'll accept both formats in case
-	   that gets fixed in the future :/ */
-	if (getplayerkeyfloat(player_localnum, "vgui_menus") == 1)
-		return true;
-	if (getplayerkeyfloat(player_localnum, "_vgui_menus") == 1)
-		return true;
-
-	return false;
+	registercommand("changeteam");
 }
 
 void VGUI_ShowMOTD(void);
 void CMD_ChooseTeam(void);
+
 void
 ClientGame_InitDone(void)
 {
-	if (serverkeyfloat("sv_playerslots") > 1)
-		VGUI_ShowMOTD();
+	VGUI_ShowMOTD();
 }
 
 void
