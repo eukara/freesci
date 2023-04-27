@@ -31,8 +31,8 @@
 #define PHY_VIEWPOS_CROUCHED [0,0,12]
 #include "items.h"
 
-	/* insanity changes player move and attack speed */
-
+/* insanity changes player move and attack speed 
+ * so lets override some base player functions */
 void
 player::Physics_InputPreMove(void)
 {
@@ -47,6 +47,9 @@ player::Physics_InputPreMove(void)
 	}
 }
 
+/* original SciHunt only increased speed melee but it's
+ * easier to do this to every weapon, plus it's more fun
+ * FIXME reloading is borked when active */
 void
 player::Physics_InputPostMove(void)
 {
