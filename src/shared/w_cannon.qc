@@ -122,7 +122,7 @@ w_cannon_primary(player pl)
 		return;
 	}
 
-	if (pl.cannon_mag != 2) {
+	if (pl.cannon_mag != 2 && cvar("sh_hchorror") != 1) {
 		w_cannon_reload(pl);
 		return;
 	}
@@ -133,14 +133,23 @@ w_cannon_primary(player pl)
 	int dmg;
 	dmg = Skill_GetValue("plr_cannon", 5);
 	TraceAttack_FireBullets(20, pl.origin + pl.view_ofs, dmg, [0.08716,0.04362], WEAPON_CANNON);
+
+	if (cvar("sh_hchorror") != 1)
 	pl.cannon_mag -= 2;
+
 	Sound_Play(pl, CHAN_WEAPON, "weapon_cannon.shoot");
 	Weapons_UpdateAmmo(pl, pl.cannon_mag, pl.ammo_buckshot, __NULL__);
 #endif
 	Weapons_ViewPunchAngle(pl, [-5,0,0]);
 	Weapons_ViewAnimation(pl, CANNON_FIREBOTH);
-	pl.w_attack_next = 1.5f;
-	pl.w_idle_next = 2.5f;
+
+	if (cvar("sh_hchorror") != 1) {
+		pl.w_attack_next = 1.5f;
+		pl.w_idle_next = 2.5f;
+	} else {
+		pl.w_attack_next = 0.5f;
+		pl.w_idle_next = 0.5f;
+	}
 
 	if (self.flags & FL_CROUCHING)
 		Animation_PlayerTop(pl, ANIM_CR_SHOOTSHOTGUN, 0.41f);
@@ -156,7 +165,7 @@ w_cannon_secondary(player pl)
 		return;
 	}
 
-	if (!pl.cannon_mag) {
+	if (!pl.cannon_mag && cvar("sh_hchorror") != 1) {
 		w_cannon_reload(pl);
 		return;
 	}
@@ -167,7 +176,10 @@ w_cannon_secondary(player pl)
 	int dmg;
 	dmg = Skill_GetValue("plr_cannon", 5);
 	TraceAttack_FireBullets(10, pl.origin + pl.view_ofs, dmg, [0.08716,0.04362], WEAPON_CANNON);
+
+	if (cvar("sh_hchorror") != 1)
 	pl.cannon_mag--;
+
 	Sound_Play(pl, CHAN_WEAPON, "weapon_cannon.shoot");
 #endif
 
@@ -177,8 +189,13 @@ w_cannon_secondary(player pl)
 		Weapons_ViewAnimation(pl, CANNON_FIRERIGHT);
 	}
 
-	pl.w_attack_next = 1.5f;
-	pl.w_idle_next = 2.5f;
+	if (cvar("sh_hchorror") != 1) {
+		pl.w_attack_next = 1.5f;
+		pl.w_idle_next = 2.5f;
+	} else {
+		pl.w_attack_next = 0.5f;
+		pl.w_idle_next = 0.5f;
+	}
 
 	if (self.flags & FL_CROUCHING)
 		Animation_PlayerTop(pl, ANIM_CR_SHOOTSHOTGUN, 0.41f);
