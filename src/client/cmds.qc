@@ -45,8 +45,6 @@ CMD_ChooseTeam(void)
 	if (serverkeyfloat("sv_playerslots") <= 1)
 		return;
 
-		if (serverkeyfloat("teams") > 1)
-
+	if (serverkeyfloat("teams") > 1)
 		VGUI_ChooseTeam();
-
 }

@@ -42,109 +42,6 @@ HLGameRules::IsMultiplayer(void)
 }
 
 void
-HLGameRules::PlayerDeath(NSClientPlayer pl)
-{
-
-	player sh_pl = (player)pl;
-
-	/* obituary networking */
-	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
-	WriteByte(MSG_MULTICAST, EV_OBITUARY);
-	if (g_dmg_eAttacker.netname)
-		WriteString(MSG_MULTICAST, g_dmg_eAttacker.netname);
-	else
-		WriteString(MSG_MULTICAST, g_dmg_eAttacker.classname);
-	WriteString(MSG_MULTICAST, pl.netname);
-	WriteByte(MSG_MULTICAST, g_dmg_iWeapon);
-	WriteByte(MSG_MULTICAST, 0);
-	msg_entity = world;
-	multicast([0,0,0], MULTICAST_ALL);
-
-	/* death-counter */
-	pl.deaths++;
-	forceinfokey(pl, "*deaths", ftos(pl.deaths));
-
-	/* update score-counter */
-	if (pl.flags & FL_CLIENT || pl.flags & FL_MONSTER)
-	if (g_dmg_eAttacker.flags & FL_CLIENT) {
-		if (pl == g_dmg_eAttacker)
-			g_dmg_eAttacker.frags--;
-		else
-			g_dmg_eAttacker.frags++;
-	}
-
-
-	pl.Death();
-	pl.takedamage = DAMAGE_NO;
-	pl.gflags &= ~GF_FLASHLIGHT;
-	pl.gflags &= ~GF_EGONBEAM;
-	pl.gflags &= ~GF_MADNESS;
-	pl.poisonTimer.StopTimer();
-
-	sh_pl.sh_insaneactive = 0.0f;
-
-	pl.think = PutClientInServer;
-	pl.nextthink = time + 4.0f;
-	Sound_Play(pl, CHAN_AUTO, "player.die");
-
-	/* either gib, or make a corpse */
-	if (pl.health < -50) {
-		FX_GibHuman(pl.origin, vectoangles(pl.origin - g_dmg_eAttacker.origin), g_dmg_iDamage * 2.0f);
-	} else {
-		FX_Corpse_Spawn((player)pl, ANIM_DIESIMPLE);
-	}
-}
-
-void
-HLGameRules::PlayerSpawn(NSClientPlayer pp)
-{
-	player pl = (player)pp;
-	/* this is where the mods want to deviate */
-	entity spot;
-
-	pl.classname = "player";
-	pl.health = pl.max_health = 100;
-	pl.takedamage = DAMAGE_YES;
-	pl.solid = SOLID_SLIDEBOX;
-	pl.movetype = MOVETYPE_WALK;
-	pl.flags = FL_CLIENT;
-	pl.viewzoom = 1.0;
-	pl.model = "models/player.mdl";
-	string mymodel = infokey(pl, "model");
-
-	if (mymodel) {
-		mymodel = sprintf("models/player/%s/%s.mdl", mymodel, mymodel);
-		if (whichpack(mymodel)) {
-			pl.model = mymodel;
-		}
-	}
-	setmodel(pl, pl.model);
-
-	setsize(pl, VEC_HULL_MIN, VEC_HULL_MAX);
-	pl.velocity = [0,0,0];
-	pl.gravity = __NULL__;
-	pl.frame = 1;
-	pl.SendFlags = UPDATE_ALL;
-	pl.customphysics = Empty;
-	pl.iBleeds = TRUE;
-	forceinfokey(pl, "*spec", "0");
-	forceinfokey(pl, "*deaths", ftos(pl.deaths));
-
-	spot = Spawn_SelectRandom("info_player_deathmatch");
-	setorigin(pl, spot.origin);
-	pl.angles = spot.angles;
-
-	pl.g_items = ITEM_CROWBAR | ITEM_GLOCK | ITEM_SUIT;
-	pl.activeweapon = WEAPON_GLOCK;
-	pl.glock_mag = 18;
-	pl.ammo_9mm = 44;
-	Weapons_RefreshAmmo(pl);
-	SHData_GetItems(pl);
-
-	Client_FixAngle(pl, pl.angles);
-}
-
-void
 HLGameRules::LevelDecodeParms(NSClientPlayer pp)
 {
 	player pl = (player)pp;
@@ -297,6 +194,9 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 	if (g_weapons[g_dmg_iWeapon].slot != 0)
 		return;
 
+	if (cvar("sh_insanity") == 0)
+		return;
+
 	/* if this is our first kill in a while, or in the timer... */
 	if (pl.sh_insanecount == 0 || pl.sh_insanetime > time) {
 		pl.sh_insanecount++;
@@ -325,39 +225,184 @@ HLGameRules::ScientistKill(NSClientPlayer pp, entity sci)
 void
 HLGameRules::FrameStart(void)
 {
+	if (cvar("timelimit"))
+	if (time >= (cvar("timelimit") * 60)) {
+		IntermissionStart();
+	}
+
 	entity e;
 
+	/* restock players every 2 minutes */
 	if (m_flRestockTimer < time) {
 		m_flRestockTimer = time + 120.0f;
 		
 		for (e = world; (e = find(e, ::classname, "player"));) {
 			player pl = (player)e;
+
+			/* Don't give spectators weapons */
+			if (pl.IsFakeSpectator() == false && pl.IsRealSpectator() == false)
 			SHData_GetItems(pl);
 		}
 	}
 
-	if (autocvar(sh_respbreak, 1))
-	if (m_flBreakRespawnTimer < time) {
-		m_flBreakRespawnTimer = time + 120.0f;
+	/* respawn breakables every 2 minutes */
+	if (cvar("sh_respbreak") == 1) {
+		if (m_flBreakRespawnTimer < time) {
+			m_flBreakRespawnTimer = time + 120.0f;
 		
-		for (e = world; (e = find( e, ::classname, "func_breakable"));) {
-			func_breakable br = (func_breakable)e;
-			br.Respawn();
-		}
-		for (e = world; (e = find( e, ::classname, "func_pushable"));) {
-			func_pushable pb = (func_pushable)e;
-			pb.Respawn();
-		}
-		for (e = world; (e = find( e, ::classname, "env_shooter"));) {
-			env_shooter sh = (env_shooter)e;
-			sh.Respawn();
+			for (e = world; (e = find( e, ::classname, "func_breakable"));) {
+				func_breakable br = (func_breakable)e;
+				br.Respawn();
+			}
+			for (e = world; (e = find( e, ::classname, "func_pushable"));) {
+				func_pushable pb = (func_pushable)e;
+				pb.Respawn();
+			}
+			for (e = world; (e = find( e, ::classname, "env_shooter"));) {
+				env_shooter sh = (env_shooter)e;
+				sh.Respawn();
+			}
 		}
 	}
 }
 
 void
+HLGameRules::CheckRules(void)
+{
+	/* last person who killed somebody has hit the limit */
+	if (cvar("fraglimit"))
+	if (g_dmg_eAttacker.frags >= cvar("fraglimit"))
+		IntermissionStart();
+}
+
+void
+HLGameRules::PlayerDeath(NSClientPlayer pl)
+{
+
+	player sh_pl = (player)pl;
+	
+	/* obituary networking */
+	WriteByte(MSG_MULTICAST, SVC_CGAMEPACKET);
+	WriteByte(MSG_MULTICAST, EV_OBITUARY);
+	WriteString(MSG_MULTICAST, (g_dmg_eAttacker.netname) ? g_dmg_eAttacker.netname : g_dmg_eAttacker.classname);
+	WriteString(MSG_MULTICAST, pl.netname);
+	WriteByte(MSG_MULTICAST, g_dmg_iWeapon);
+	WriteByte(MSG_MULTICAST, 0);
+	msg_entity = world;
+	multicast([0,0,0], MULTICAST_ALL);
+
+	Plugin_PlayerObituary(g_dmg_eAttacker, g_dmg_eTarget, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
+
+	/* death-counter */
+	pl.deaths++;
+	pl.SetInfoKey("*deaths", ftos(pl.deaths));
+
+	/* update score-counter */
+	if (pl.flags & FL_CLIENT || pl.flags & FL_MONSTER)
+	if (g_dmg_eAttacker.flags & FL_CLIENT) {
+		if (pl == g_dmg_eAttacker)
+			g_dmg_eAttacker.frags--;
+		else
+			g_dmg_eAttacker.frags++;
+	}
+
+#ifdef VALVE
+	/* explode all satchels */
+	s_satchel_detonate((entity)pl);
+	/* drop their posessions into a weaponbox item */
+	weaponbox_spawn((player)pl);
+#endif
+
+	/* either gib, or make a corpse */
+	if (pl.health < -50) {
+		FX_GibHuman(pl.origin, vectoangles(pl.origin - g_dmg_eAttacker.origin), g_dmg_iDamage * 2.0f);
+	} else {
+		FX_Corpse_Spawn((player)pl, ANIM_DIESIMPLE);
+	}
+
+	/* now let's make the real client invisible */
+	pl.Death();
+	pl.SetTakedamage(DAMAGE_NO);
+	pl.gflags &= ~GF_FLASHLIGHT;
+	pl.gflags &= ~GF_EGONBEAM;
+	pl.gflags &= ~GF_MADNESS;
+	pl.poisonTimer.StopTimer();
+
+	sh_pl.sh_insaneactive = 0.0f;
+
+	Sound_Play(pl, CHAN_AUTO, "player.die");
+
+	/* force respawn */
+	pl.ScheduleThink(PutClientInServer, 4.0f);
+
+	/* have we gone over the fraglimit? */
+	CheckRules();
+}
+
+void
+HLGameRules::PlayerSpawn(NSClientPlayer pp)
+{
+	player pl = (player)pp;
+	/* this is where the mods want to deviate */
+	entity spot;
+
+	pl.classname = "player";
+	pl.health = pl.max_health = 100;
+	pl.takedamage = DAMAGE_YES;
+	pl.solid = SOLID_SLIDEBOX;
+	pl.movetype = MOVETYPE_WALK;
+	pl.flags = FL_CLIENT;
+	pl.viewzoom = 1.0;
+	pl.model = "models/player.mdl";
+	string mymodel = infokey(pl, "model");
+
+	if (mymodel) {
+		mymodel = sprintf("models/player/%s/%s.mdl", mymodel, mymodel);
+		if (whichpack(mymodel)) {
+			pl.model = mymodel;
+		}
+	}
+	setmodel(pl, pl.model);
+
+	setsize(pl, VEC_HULL_MIN, VEC_HULL_MAX);
+	pl.velocity = [0,0,0];
+	pl.gravity = __NULL__;
+	pl.frame = 1;
+	pl.SendFlags = UPDATE_ALL;
+	pl.customphysics = Empty;
+	pl.iBleeds = TRUE;
+	forceinfokey(pl, "*spec", "0");
+	forceinfokey(pl, "*deaths", ftos(pl.deaths));
+
+	if (pl.team == 1) {
+		spot = Spawn_SelectRandom("info_player_team1");
+	} else if (pl.team == 2) {
+		spot = Spawn_SelectRandom("info_player_team2");
+	}
+
+	if (!spot) {
+		spot = Spawn_SelectRandom("info_player_deathmatch");
+	}
+	
+	
+	setorigin(pl, spot.origin);
+	pl.angles = spot.angles;
+
+	pl.g_items = ITEM_CROWBAR | ITEM_GLOCK | ITEM_SUIT;
+	pl.activeweapon = WEAPON_GLOCK;
+	pl.glock_mag = 18;
+	pl.ammo_9mm = 44;
+	Weapons_RefreshAmmo(pl);
+	SHData_GetItems(pl);
+
+	Client_FixAngle(pl, pl.angles);
+}
+
+void
 HLGameRules::InitPostEnts(void)
 {
+	MOTD_LoadDefault();
+
 	forceinfokey(world, "teams", "0");
 	forceinfokey(world, "team_1", "");
 	forceinfokey(world, "team_2", "");
@@ -381,7 +426,7 @@ HLGameRules::HLGameRules(void)
 	 * then set the default */
 	cvar_set("sh_scispeed","40");
 
-	/* just re-read this to prevent funny beahviour */
+	/* just re-read this to prevent race conditions */
 	readcmd(sprintf("exec maps/%s.cfg\n", mapname));
 
 	/* always broadcast how many max scientists the server has set 
@@ -401,36 +446,28 @@ SHTeamRules::IsTeamplay(void)
 }
 
 void
-SHTeamRules::PlayerSpawn(NSClientPlayer cl)
+SHTeamRules::PlayerSpawn(NSClientPlayer pp)
+{
+	player pl = (player)pp;
+
+	if (pl.team > 0) {
+		super::PlayerSpawn(pl);
+		return;
+	}
+
+	pl.MakeTempSpectator(); /* replace this with a non-spectator ghost */
+	Spawn_ObserverCam(pl);
+}
+
+void
+SHTeamRules::PlayerTeamSpawn(NSClientPlayer pl)
 {
 	int red = 0;
 	int blue = 0;
 
-	super::PlayerSpawn(cl);
-
-	/* remove this if you want an auto-balance upon every death */
-	if (cl.team != 0)
-		return;
-
-	/* auto-balance 
-	 * TODO make this a command instead */
-	for (entity e = world; (e = find( e, ::classname, "player"));) {
-		if (e == cl)
-			continue;
-		if (e.team == 1)
-			red++;
-		if (e.team == 2)
-			blue++;
-	}
-
-	/* assign to whatever team has fewer players */
-	if (red > blue)
-		cl.team = 2;
-	else
-		cl.team = 1;
-
-	forceinfokey(cl, "*team", sprintf("%d", cl.team));
+	super::PlayerSpawn(pl);
 }
+
 
 void
 SHTeamRules::ScientistKill(NSClientPlayer cl, entity sci)
@@ -487,6 +524,8 @@ SHTeamRules::RegisterSciDeath(void)
 void
 SHTeamRules::InitPostEnts(void)
 {
+	MOTD_LoadDefault();
+
 	forceinfokey(world, "teamkills_1", sprintf("%i", m_iKillsTeam1));
 	forceinfokey(world, "teamkills_2", sprintf("%i", m_iKillsTeam2));
 	forceinfokey(world, "teams", "2");
@@ -534,4 +573,68 @@ void
 SHRules::SHRules(void)
 {
 
+}
+
+void
+CSEv_JoinAuto(void)
+{
+	SHTeamRules rules = (SHTeamRules)g_grMode;
+	player pl = (player)self;
+	int red = 0;
+	int blue = 0;
+
+	/* matches Game_InitRules() */
+	if (cvar("sv_playerslots") == 1 || cvar("coop") == 1) {
+		return;
+	}
+
+	/* count for auto-balance */
+	for (entity e = world; (e = find( e, ::classname, "player"));) {
+		if (e == pl)
+			continue;
+		if (e.team == 1)
+			red++;
+		if (e.team == 2)
+			blue++;
+	}
+
+	/* assign to whatever team has fewer players */
+	if (red > blue)
+		pl.team = 2;
+	else
+		pl.team = 1;
+
+	forceinfokey(pl, "*team", sprintf("%d", pl.team));
+
+	rules.PlayerTeamSpawn(pl);
+}
+
+void
+CSEv_JoinTeam_f(float teamNumber)
+{
+	SHTeamRules rules = (SHTeamRules)g_grMode;
+	player pl = (player)self;
+
+	/* matches Game_InitRules() */
+	if (cvar("sv_playerslots") == 1 || cvar("coop") == 1) {
+		return;
+	}
+
+	pl.team = teamNumber;
+	forceinfokey(pl, "*team", sprintf("%d", pl.team));
+
+	rules.PlayerTeamSpawn(pl);
+}
+
+void
+CSEv_JoinSpectator(void)
+{
+	SHTeamRules rules = (SHTeamRules)g_grMode;
+	player pl = (player)self;
+
+	pl.team = 0;
+
+	forceinfokey(pl, "*team", sprintf("%d", pl.team));
+
+	rules.PlayerSpawn(pl);
 }

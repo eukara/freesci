@@ -16,20 +16,20 @@
 
 static VGUIWindow winChooseTeam;
 
-class TFTeamButton:VGUIButton
+class TeamButton:VGUIButton
 {
-	void TFTeamButton(void);
+	void TeamButton(void);
 
 	virtual void OnMouseUp(void);
 };
 
 void
-TFTeamButton::TFTeamButton(void)
+TeamButton::TeamButton(void)
 {
 }
 
 void
-TFTeamButton::OnMouseUp(void)
+TeamButton::OnMouseUp(void)
 {
 	int tag = GetTag();
 
@@ -74,6 +74,27 @@ VGUI_ChooseTeam(void)
 	static VGUILabel lblMapName;
 	static VGUILabel lblMapInfo;
 
+	static void VGUI_AutoAssign(void) {
+		sendevent("JoinAuto", "");
+		winChooseTeam.Hide();
+	}
+
+	static void VGUI_JoinRed(void) {
+		sendevent("JoinTeam", "f", 1);
+		winChooseTeam.Hide();
+	}
+
+	static void VGUI_JoinBlue(void) {
+		sendevent("JoinTeam", "f", 2);
+		winChooseTeam.Hide();
+	}
+
+	static void VGUI_JoinSpectator(void) {
+		sendevent("JoinSpectator", "");
+		winChooseTeam.Hide();
+	}
+
+
 	if (!initialized) {
 		vector btnpos = [40,80];
 
@@ -108,7 +129,7 @@ VGUI_ChooseTeam(void)
 		btnTeamBlue.SetPos(btnpos);
 		btnTeamBlue.SetSize('124 24');
 		btnTeamBlue.SetKeyEquivalent("1");
-		//btnAutoAssign.SetFunc(VGUI_AutoAssign);
+		btnTeamBlue.SetFunc(VGUI_JoinBlue);
 		btnpos[1] += 32;
 
 		btnTeamRed = spawn(VGUIButton);
@@ -116,7 +137,7 @@ VGUI_ChooseTeam(void)
 		btnTeamRed.SetPos(btnpos);
 		btnTeamRed.SetSize('124 24');
 		btnTeamRed.SetKeyEquivalent("2");
-		//btnAutoAssign.SetFunc(VGUI_AutoAssign);
+		btnTeamRed.SetFunc(VGUI_JoinRed);
 		btnpos[1] += 32;
 
 		btnAutoAssign = spawn(VGUIButton);
@@ -124,7 +145,7 @@ VGUI_ChooseTeam(void)
 		btnAutoAssign.SetPos(btnpos);
 		btnAutoAssign.SetSize('124 24');
 		btnAutoAssign.SetKeyEquivalent("5");
-		//btnAutoAssign.SetFunc(VGUI_AutoAssign);
+		btnAutoAssign.SetFunc(VGUI_AutoAssign);
 		btnpos[1] += 32;
 
 		btnGoSpectator = spawn(VGUIButton);
@@ -132,7 +153,7 @@ VGUI_ChooseTeam(void)
 		btnGoSpectator.SetPos(btnpos);
 		btnGoSpectator.SetSize('124 24');
 		btnGoSpectator.SetKeyEquivalent("6");
-		//btnGoSpectator.SetFunc(VGUI_GoSpectator);
+		btnGoSpectator.SetFunc(VGUI_JoinSpectator);
 
 		g_uiDesktop.Add(winChooseTeam);
 		winChooseTeam.Add(frmMapInfo);

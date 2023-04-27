@@ -32,6 +32,7 @@ class HLGameRules:CGameRules
 	virtual void(NSClientPlayer) LevelChangeParms;
 	virtual void(void) LevelNewParms;
 	virtual void(void) FrameStart;
+	virtual void(void) CheckRules;
 	virtual bool(void) IsMultiplayer;
 	virtual void(void) RestartRound;
 
@@ -53,6 +54,7 @@ class SHTeamRules:HLGameRules
 
 	virtual void(void) RestartRound;
 	virtual void(NSClientPlayer) PlayerSpawn;
+	virtual void(NSClientPlayer) PlayerTeamSpawn;
 	virtual bool(void) IsTeamplay;
 	virtual void(void) AddTeam1Kill;
 	virtual void(void) AddTeam2Kill;
@@ -129,6 +131,9 @@ typedef enum
 var shmode_e autocvar_sh_realistic = SHMODE_SLAUGHTER;
 var shmode_e g_chosen_mode;
 
+/* enable team changing */
+var int autocvar_sh_allowteamchange = 1;
+
 /* limit the amount of scientists that can spawn by default */
 var int autocvar_sh_scimax = 5;
 
@@ -139,6 +144,9 @@ var int autocvar_sh_scispeed = 40;
 
 /* enable scientist obituaries */
 var int autocvar_sh_announcescideath = 1;
+
+/* enable scientist scoreboard */
+var int autocvar_sh_announcescinum = 1;
 
 /* default kills required for insanity */
 var int autocvar_sh_insanity = 5;
