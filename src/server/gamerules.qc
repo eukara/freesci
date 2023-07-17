@@ -333,7 +333,9 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 	Sound_Play(pl, CHAN_AUTO, "player.die");
 
 	/* force respawn */
-	pl.ScheduleThink(PutClientInServer, 4.0f);
+	if (cvar("mp_forcerespawn") == 1) {
+		pl.ScheduleThink(PutClientInServer, 4.0f);
+	}
 
 	/* have we gone over the fraglimit? */
 	CheckRules();
@@ -374,15 +376,50 @@ HLGameRules::PlayerSpawn(NSClientPlayer pp)
 	forceinfokey(pl, "*spec", "0");
 	forceinfokey(pl, "*deaths", ftos(pl.deaths));
 
+
+	/* if we have team flags set, then join a team spawn 
+	 * search for the entity though in case we're on a non scihunt map */
 	if (pl.team == 1) {
-		spot = Spawn_SelectRandom("info_player_team1");
+		for (entity e = world; (e = find( e, ::classname, "info_player_team1"));) {
+			spot = Spawn_SelectRandom("info_player_team1");
+		}
+
 	} else if (pl.team == 2) {
-		spot = Spawn_SelectRandom("info_player_team2");
+		for (entity e = world; (e = find( e, ::classname, "info_player_team2"));) {
+			spot = Spawn_SelectRandom("info_player_team2");
+		}
 	}
 
-	if (!spot) {
-		spot = Spawn_SelectRandom("info_player_deathmatch");
+	/* while different behaviour from original, this could be better for other gamemodes */
+	for (entity e = world; (e = find( e, ::classname, "info_player_deathmatch"));) {
+			spot = Spawn_SelectRandom("info_player_deathmatch");
 	}
+
+
+	/* all gamemodes use scihunt team spawns by default */
+	if (!spot) {
+		int r = floor(random(0,1));
+		switch (r) {
+		case 0:
+			for (entity e = world; (e = find( e, ::classname, "info_player_team1"));) {
+				spot = Spawn_SelectRandom("info_player_team1");
+			}
+			break;
+		case 1:
+			for (entity e = world; (e = find( e, ::classname, "info_player_team2"));) {
+				spot = Spawn_SelectRandom("info_player_team2");
+			}
+			break;
+		}
+	}
+
+	/* if nothing else is found, then look for standard half-life spawns (compat) */
+	if (!spot) {
+		for (entity e = world; (e = find( e, ::classname, "info_player_start"));) {
+			spot = Spawn_SelectRandom("info_player_start");
+		}
+	}
+
 	
 	
 	setorigin(pl, spot.origin);
@@ -422,20 +459,68 @@ HLGameRules::HLGameRules(void)
 	 * have a race condition */
 	forceinfokey(world, "sci_count", "0");
 
+	/* realistic is an odd name, allow people to use sv_gamemode as an alias */
+	if (cvar("sv_gamemode")) {
+	cvar_set("sh_realistic",cvar_string("sv_gamemode"));
+	} else {
+	cvar_set("sv_gamemode",cvar_string("sh_realistic"));
+	}
+
 	/* if the previous map set this value but the current doesn't
 	 * then set the default */
 	cvar_set("sh_scispeed","40");
 
-	/* just re-read this to prevent race conditions */
-	readcmd(sprintf("exec maps/%s.cfg\n", mapname));
+	cvar_set("fraglimit",cvar_string("mp_fraglimit"));
+
+	cvar_set("timelimit",cvar_string("mp_timelimit"));
+
+	/* this is in the settings.scr, leftover? */
+	cvar_set("sh_levelexec",cvar_string("lvlconfig"));
+
+	/* since Nuclide adopted levelexec, let's just set it like this for compat */
+	cvar_set("sv_levelexec",cvar_string("sh_levelexec"));
+
+	if (cvar("sh_levelexec") != 0) {
+		/* just re-read this to prevent race conditions */
+		readcmd(sprintf("exec maps/%s.cfg\n", mapname));
+	}
 
 	/* always broadcast how many max scientists the server has set 
 	 * but allow an override for server admins */
-	if (cvar("sh_scimax_override") > 0) {
+	if (cvar("sh_scimax_override") != 0) {
 		forceinfokey(world, "sv_scimax", cvar_string("sh_scimax_override"));
 	} else {
 		forceinfokey(world, "sv_scimax", cvar_string("sh_scimax"));
 	}
+
+}
+
+bool
+HLGameRules::ConsoleCommand(NSClientPlayer pp, string cmd)
+{
+	tokenize(cmd);
+
+	switch (argv(0)) {
+	case "bot_add":
+		bot pete = (bot)Bot_AddQuick();
+		Bot_RandomColormap(pete);
+		searchhandle pm = search_begin("models/player/*/*.mdl", TRUE, TRUE);
+		int r = floor(random(0, search_getsize(pm)));
+		string mdl = substring(search_getfilename(pm, r), 0, -5);
+		tokenizebyseparator(mdl, "/");
+		forceinfokey(pete, "model", argv(2));
+		search_end(pm);
+		break;
+	case "jumptest":
+		makevectors(pp.v_angle);
+		traceline(pp.origin + pp.view_ofs, pp.origin + pp.view_ofs + v_forward * 1024, FALSE, pp);
+		pp.velocity = Route_GetJumpVelocity(pp.origin, trace_endpos, pp.gravity);
+		break;
+	default:
+		return (false);
+	}
+
+	return (true);
 }
 
 /* TEAMPLAY ONLY LOGIC */
@@ -467,7 +552,6 @@ SHTeamRules::PlayerTeamSpawn(NSClientPlayer pl)
 
 	super::PlayerSpawn(pl);
 }
-
 
 void
 SHTeamRules::ScientistKill(NSClientPlayer cl, entity sci)
@@ -555,7 +639,7 @@ SHTeamRules::SHTeamRules(void)
 
 /* invasion scientist death tracking */
 void
-SHRules::RegisterSciDeath(void)
+SHInvasionRules::RegisterSciDeath(void)
 {
 	super::RegisterSciDeath();
 
@@ -570,7 +654,18 @@ SHRules::RegisterSciDeath(void)
 }
 
 void
-SHRules::SHRules(void)
+SHInvasionRules::PlayerDeath(NSClientPlayer pl)
+{
+	pl = (player)pl;
+
+	super::PlayerDeath(pl);
+
+	pl.MakeTempSpectator();
+
+}
+
+void
+SHInvasionRules::SHInvasionRules(void)
 {
 
 }

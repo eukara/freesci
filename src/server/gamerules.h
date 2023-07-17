@@ -28,6 +28,7 @@ class HLGameRules:CGameRules
 	virtual void(NSClientPlayer, entity) ScientistKill;
 	virtual void(void) RegisterSciDeath;
 
+	virtual bool(NSClientPlayer, string) ConsoleCommand;
 	virtual void(NSClientPlayer) LevelDecodeParms;
 	virtual void(NSClientPlayer) LevelChangeParms;
 	virtual void(void) LevelNewParms;
@@ -63,9 +64,9 @@ class SHTeamRules:HLGameRules
 	virtual void(void) InitPostEnts;
 };
 
-class SHRules:HLGameRules
+class SHInvasionRules:HLGameRules
 {
-	void(void) SHRules;
+	void(void) SHInvasionRules;
 	virtual void(void) RegisterSciDeath;
 };
 
@@ -112,7 +113,7 @@ class SHGameMadness:HLGameRules
 /* Invasion (5):
 	Unique new round-based gamemode where scientists attack similar to madness but work together to kill everyone else. If players eleminate all scientists, then they win the round and have to do it all over again. Heavy WIP. Scientists and players don't respawn.
 */
-class SHGameInvasion:SHRules
+class SHGameInvasion:SHInvasionRules
 {
 	void(void) SHGameInvasion;
 };
@@ -131,13 +132,17 @@ typedef enum
 var shmode_e autocvar_sh_realistic = SHMODE_SLAUGHTER;
 var shmode_e g_chosen_mode;
 
+/* enable forcerespawn */
+var int autocvar_mp_forcerespawn = 1;
+
 /* enable team changing */
 var int autocvar_sh_allowteamchange = 1;
 
+/* enable map configs */
+var int autocvar_sh_levelexec = 1;
+
 /* limit the amount of scientists that can spawn by default */
 var int autocvar_sh_scimax = 5;
-
-var int autocvar_sh_scialert = FALSE;
 
 /* default speed for scientists */
 var int autocvar_sh_scispeed = 40;

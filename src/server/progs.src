@@ -70,6 +70,8 @@ monster_scientist.qc
 ../../../valve/src/server/xen_plantlight.qc
 ../../../valve/src/server/ammo.qc
 
+../../../src/botlib/include.src
+
 shdata_parse.qc
 gamerules.qc
 gamerules_fear.qc
@@ -83,8 +85,6 @@ server.qc
 ../../../valve/src/server/damage.qc
 ../../../valve/src/server/flashlight.qc
 ../../../valve/src/server/modelevent.qc
-
-../../../src/botlib/include.src
 
 ../../../valve/src/server/spawn.qc
 
