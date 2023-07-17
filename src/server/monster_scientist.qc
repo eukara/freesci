@@ -442,9 +442,8 @@ monster_scientist::Respawn(void)
 	if (g_chosen_mode == SHMODE_INVASION)
 		m_iAlliance = MAL_ALIEN;
 
-	/* scientists are always afraid in standard hunting
-	 * and scialert mode */ 
-	if (autocvar_sh_scialert || g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION) {
+	/* scientists are always afraid in these modes */ 
+	if (g_chosen_mode == SHMODE_STANDARD || g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION) {
 		m_iFlags |= MONSTER_FEAR;
 	}
 
@@ -519,7 +518,12 @@ monster_scientist::Spawned(void)
 	m_talkUnfollow = "!SC_WAIT";
 	m_talkFollow = "!SC_OK";
 	m_talkStopFollow = "!SC_STOP";
+
+	if (cvar("sh_scirand") == 1) {
 	m_iBody = -1;
+	} else {
+	m_iBody = "";
+	}
 
 	model = "models/scientist.mdl";
 	base_mins = [-16,-16,0];
