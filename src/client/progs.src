@@ -34,6 +34,7 @@ cmds.qc
 ../../../valve/src/client/hud_dmgnotify.qc
 ../../../valve/src/client/hud_itemnotify.qc
 hud.qc
+../../../valve/src/client/hud_sprite.qc
 ../../../valve/src/client/hud_weaponselect.qc
 ../../../valve/src/client/scoreboard.qc
 ../../../valve/src/client/modelevent.qc

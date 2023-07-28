@@ -99,7 +99,7 @@ void w_chainsaw_primary(player pl)
 		pl.w_attack_next = 0.2f;
 	} else {
 		int dmg;
-		FX_Impact(IMPACT_MELEE, trace_endpos, trace_plane_normal);
+		SurfData_Impact(trace_ent, trace_endpos, trace_plane_normal);
 		
 		if (trace_ent.takedamage) {
 			if (trace_ent.iBleeds) {
@@ -113,7 +113,7 @@ void w_chainsaw_primary(player pl)
 		} else {
 			/* well, this is in the advanced options */
 			if (cvar("sh_chainspark") != 1)
-			FX_Spark(trace_endpos, trace_plane_normal);
+				pointparticles(particleeffectnum("fx_spark.main"), trace_endpos, [0,0,0], 1);
 
 			Sound_Play(pl, CHAN_WEAPON, "weapon_chainsaw.hit");
 		}
