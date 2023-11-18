@@ -14,7 +14,7 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-/*QUAKED monster_scientist (0 0.8 0.8) (-16 -16 0) (16 16 72)
+/*QUAKED SHScientist (0 0.8 0.8) (-16 -16 0) (16 16 72)
 
 HALF-LIFE (1998) ENTITY
 
@@ -69,9 +69,9 @@ enum
 	SCIA_DEADTABLE3
 };
 
-class monster_scientist:NSTalkMonster
+class SHScientist:NSTalkMonster
 {
-	void(void) monster_scientist;
+	void(void) SHScientist;
 
 	/* override */
 	virtual void(void) SeeThink;
@@ -80,28 +80,22 @@ class monster_scientist:NSTalkMonster
 	virtual float(void) GetRunSpeed;
 	virtual void(void) PanicFrame;
 
-	virtual void(void) Spawned;
 	virtual void(void) Respawn;
 	virtual void(void) Pain;
 	virtual void(void) Death;
 	virtual void(void) PlayerUse;
 	virtual void(void) TalkPanic;
-	virtual int(void) AnimIdle;
-	virtual int(void) AnimWalk;
-	virtual int(void) AnimRun;
 
 	virtual int(void) AttackMelee;
 	virtual void(void) AttackNeedle;
 
 	virtual void(void) FallNoise;
-
-	virtual void(string, string) SpawnKey;
 };
 
 
 /* Players scare scientists if they see them in Stealth Hunting */
 void
-monster_scientist::SeeThink(void)
+SHScientist::SeeThink(void)
 {
 	/* let's call the original monster SeeThink function */
 	super::SeeThink();
@@ -126,28 +120,28 @@ monster_scientist::SeeThink(void)
 
 /* scientist's speed is controlled via cvar */
 void
-monster_scientist::PanicFrame(void)
+SHScientist::PanicFrame(void)
 {
 	super::PanicFrame();
 	input_movevalues = [6 * cvar("sh_scispeed"), 0, 0];
 }
 
 float
-monster_scientist::GetWalkSpeed(void)
+SHScientist::GetWalkSpeed(void)
 {
 	super::GetWalkSpeed();
 	return 1.6 * cvar("sh_scispeed");
 }
 
 float
-monster_scientist::GetChaseSpeed(void)
+SHScientist::GetChaseSpeed(void)
 {
 	super:: GetChaseSpeed();
 	return 6 * cvar("sh_scispeed");
 }
 
 float
-monster_scientist::GetRunSpeed(void)
+SHScientist::GetRunSpeed(void)
 {
 	super::GetRunSpeed();
 	return 3.5 * cvar("sh_scispeed");
@@ -155,13 +149,13 @@ monster_scientist::GetRunSpeed(void)
 
 
 void
-monster_scientist::FallNoise(void)
+SHScientist::FallNoise(void)
 {
 	Sound_Speak(this, "monster_scientist.fall");
 }
 
 int
-monster_scientist::AttackMelee(void)
+SHScientist::AttackMelee(void)
 {
 	/* visual */
 	AnimPlay(61);
@@ -192,7 +186,7 @@ monster_scientist::AttackMelee(void)
 
 /* a function for poison that slowly kills the target */
 static void
-monster_scientist_NeedleAttack(entity target)
+SHScientist_NeedleAttack(entity target)
 {
 	bool isDead = false;
 	bool isHealed = false;
@@ -229,11 +223,11 @@ monster_scientist_NeedleAttack(entity target)
 }
 
 void
-monster_scientist::AttackNeedle(void)
+SHScientist::AttackNeedle(void)
 {
 	/* implement our special function so we know who are we attacking */
 	static void AttackNeedle_PoisonDamage(void) {
-		monster_scientist_NeedleAttack(self);
+		SHScientist_NeedleAttack(self);
 	}
 
 	/* look for our victim */
@@ -256,31 +250,12 @@ monster_scientist::AttackNeedle(void)
 		trace_ent.poisonTimer = trace_ent.poisonTimer.ScheduleTimer(trace_ent, AttackNeedle_PoisonDamage, 3.0f, true);
 
 		/* apply our poison attack to the victim */
-		monster_scientist_NeedleAttack(trace_ent);
+		SHScientist_NeedleAttack(trace_ent);
 	}
 }
 
-/* TODO someday these will use the ACT system */
-int
-monster_scientist::AnimIdle(void)
-{
-	return SCIA_IDLE1;
-}
-
-int
-monster_scientist::AnimWalk(void)
-{
-	return SCIA_WALK;
-}
-
-int
-monster_scientist::AnimRun(void)
-{
-	return SCIA_RUN;
-}
-
 void
-monster_scientist::TalkPanic(void)
+SHScientist::TalkPanic(void)
 {
 	/* it's annoying and prevents the laugh in these gamemodes */
 	if (g_chosen_mode == SHMODE_MADNESS || g_chosen_mode == SHMODE_INVASION)
@@ -345,9 +320,9 @@ monster_scientist::TalkPanic(void)
 }
 
 void
-monster_scientist::PlayerUse(void)
+SHScientist::PlayerUse(void)
 {
-	if (spawnflags & MSF_PREDISASTER) {
+	if (spawnflags & MSF_RESERVED3) {
 		Sentence("!SC_POK");
 		return;
 	}
@@ -361,16 +336,12 @@ monster_scientist::PlayerUse(void)
 }
 
 void
-monster_scientist::Pain(void)
+SHScientist::Pain(void)
 {
 	/* make everyone on edge */
 	WarnAllies();
 
 	if (m_flAnimTime > time) {
-		return;
-	}
-
-	if (random() < 0.25f) {
 		return;
 	}
 
@@ -383,7 +354,7 @@ monster_scientist::Pain(void)
 }
 
 void
-monster_scientist::Death(void)
+SHScientist::Death(void)
 {
 	bool deathcheck = false;
 	HLGameRules rules = (HLGameRules)g_grMode;
@@ -397,7 +368,7 @@ monster_scientist::Death(void)
 		rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
 
 		Plugin_PlayerObituary(g_dmg_eAttacker, this, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
-		Sound_Speak(this, "monster_scientist.die");
+		Sound_Speak(this, "SHScientist.die");
 		deathcheck = true;
 	}
 
@@ -417,7 +388,7 @@ monster_scientist::Death(void)
 }
 
 void
-monster_scientist::Respawn(void)
+SHScientist::Respawn(void)
 {
 	HLGameRules rules = (HLGameRules)g_grMode;
 
@@ -447,7 +418,9 @@ monster_scientist::Respawn(void)
 		m_iFlags |= MONSTER_FEAR;
 	}
 
-	m_iBody = floor(random(1,5));
+	if ((cvar("sh_scirand") == 1) || (m_iBody == 0)) {
+		m_iBody = floor(random(1,5));
+	}
 
 	SetSkin(0);
 
@@ -455,19 +428,23 @@ monster_scientist::Respawn(void)
 		case 1:
 			m_flPitch = 105;
 			netname = "Walter";
+			SetBodyInGroup(1, 1);
 			break;
 		case 2:
 			m_flPitch = 100;
 			netname = "Einstein";
+			SetBodyInGroup(1, 2);
 			break;
 		case 3:
 			m_flPitch = 95;
 			netname = "Luther";
+			SetBodyInGroup(1, 3);
 			SetSkin(1);
 			break;
 		default:
 			m_flPitch = 100;
 			netname = "Slick";
+			SetBodyInGroup(1, 4);
 	}
 
 	/* recount to update sciscore and so on */
@@ -475,95 +452,7 @@ monster_scientist::Respawn(void)
 }
 
 void
-monster_scientist::SpawnKey(string strKey, string strValue)
-{
-	switch (strKey) {
-	case "body":
-		SetBody(stoi(strValue) + 1);
-		break;
-	default:
-		super::SpawnKey(strKey, strValue);
-	}
-}
-
-void
-monster_scientist::Spawned(void)
-{
-	if (spawnflags & MSF_PREDISASTER) {
-		m_talkAsk = "";
-		m_talkPlayerAsk = "!SC_PQUEST";
-		m_talkPlayerGreet = "!SC_PHELLO";
-		m_talkPlayerIdle = "!SC_PIDLE";
-	} else {
-		m_talkAsk = "!SC_QUESTION";
-		m_talkPlayerAsk = "!SC_QUESTION";
-		m_talkPlayerGreet = "!SC_HELLO";
-		m_talkPlayerIdle = "!SC_PIDLE";
-	}
-
-	m_talkAnswer = "!SC_ANSWER";
-	m_talkAllyShot = "!SC_PLFEAR";
-	m_talkGreet = "!SC_HELLO";
-	m_talkIdle = "!SC_IDLE";
-	m_talkHearing = "!SC_HEAR";
-	m_talkSmelling = "!SC_SMELL";
-	m_talkStare = "!SC_STARE";
-	m_talkSurvived = "!SC_WOUND";
-	m_talkWounded = "!SC_MORTAL";
-
-	/* they seem to use predisaster lines regardless of disaster state */
-	m_talkPlayerWounded1 = "!SC_CUREA";
-	m_talkPlayerWounded2 = "!SC_CUREB";
-	m_talkPlayerWounded3 = "!SC_CUREC";
-	m_talkUnfollow = "!SC_WAIT";
-	m_talkFollow = "!SC_OK";
-	m_talkStopFollow = "!SC_STOP";
-
-	if (cvar("sh_scirand") == 1) {
-	m_iBody = -1;
-	} else {
-	m_iBody = "";
-	}
-
-	model = "models/scientist.mdl";
-	base_mins = [-16,-16,0];
-	base_maxs = [16,16,72];
-	base_health = Skill_GetValue("scientist_health", 20);
-
-	super::Spawned();
-
-	Sound_Precache("monster_scientist.die");
-	Sound_Precache("monster_scientist.pain");
-	Sound_Precache("monster_scientist.laugh");
-	Sound_Precache("monster_scientist.fall");
-
-	/* has the body not been overriden, etc. choose a character for us */
-	if (m_iBody == -1) {
-		SetBody((int)floor(random(1,5)));
-	}
-
-	switch (m_iBody) {
-	case 1:
-		m_flPitch = 105;
-		netname = "Walter";
-		break;
-	case 2:
-		m_flPitch = 100;
-		netname = "Einstein";
-		break;
-	case 3:
-		m_flPitch = 95;
-		netname = "Luther";
-		SetSkin(1);
-		break;
-	default:
-		m_flPitch = 100;
-		netname = "Slick";
-	}
-}
-
-void
-monster_scientist::monster_scientist(void)
+SHScientist::SHScientist(void)
 {
 
 }
