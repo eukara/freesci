@@ -278,7 +278,6 @@ HLGameRules::CheckRules(void)
 void
 HLGameRules::PlayerDeath(NSClientPlayer pl)
 {
-
 	player sh_pl = (player)pl;
 	
 	/* obituary networking */
@@ -343,6 +342,17 @@ HLGameRules::PlayerDeath(NSClientPlayer pl)
 	CheckRules();
 }
 
+bool
+HLGameRules::PlayerRequestRespawn(NSClientPlayer bp)
+{
+	if (bp.TimeSinceDeath() > 0.5f) {
+		bp.ScheduleThink(PutClientInServer, 0.0f);
+		return true;
+	}
+
+	return false;
+}
+
 void
 HLGameRules::PlayerSpawn(NSClientPlayer pp)
 {
@@ -350,6 +360,7 @@ HLGameRules::PlayerSpawn(NSClientPlayer pp)
 	/* this is where the mods want to deviate */
 	entity spot;
 
+	pl.MakePlayer();
 	pl.classname = "player";
 	pl.SetMaxHealth(100);
 	pl.SetHealth(100);
@@ -361,15 +372,21 @@ HLGameRules::PlayerSpawn(NSClientPlayer pp)
 	pl.model = "models/player.mdl";
 	string mymodel = infokey(pl, "model");
 
-	if (mymodel) {
-		mymodel = sprintf("models/player/%s/%s.mdl", mymodel, mymodel);
-		if (whichpack(mymodel)) {
-			pl.model = mymodel;
+	if (pl.team == 1) {
+		pl.model = "models/scientist.mdl";
+		setmodel(pl, pl.model);
+		pl.SetSize(VEC_HULL_MIN + [0, 0, 64], VEC_HULL_MAX + [0, 0, 64]);
+	} else {
+		if (mymodel) {
+			mymodel = sprintf("models/player/%s/%s.mdl", mymodel, mymodel);
+			if (whichpack(mymodel)) {
+				pl.model = mymodel;
+			}
 		}
+		setmodel(pl, pl.model);
+		pl.SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	}
-	setmodel(pl, pl.model);
 
-	pl.SetSize(VEC_HULL_MIN, VEC_HULL_MAX);
 	pl.ClearVelocity();
 	pl.gravity = __NULL__;
 	pl.SetFrame(1);
@@ -428,10 +445,15 @@ HLGameRules::PlayerSpawn(NSClientPlayer pp)
 	setorigin(pl, spot.origin);
 	pl.angles = spot.angles;
 
-	pl.g_items = ITEM_CROWBAR | ITEM_GLOCK | ITEM_SUIT;
-	pl.activeweapon = WEAPON_GLOCK;
-	pl.glock_mag = 18;
-	pl.ammo_9mm = 44;
+	if (pl.IsScientist() == true) {
+		pl.g_items = ITEM_NEEDLE | ITEM_SUIT;
+		pl.activeweapon = WEAPON_NEEDLE;
+	} else {
+		pl.g_items = ITEM_CROWBAR | ITEM_GLOCK | ITEM_SUIT;
+		pl.activeweapon = WEAPON_GLOCK;
+		pl.glock_mag = 18;
+		pl.ammo_9mm = 44;
+	}
 	Weapons_RefreshAmmo(pl);
 	SHData_GetItems(pl);
 
@@ -461,13 +483,6 @@ HLGameRules::HLGameRules(void)
 	/* HACK we'll set this here for now to ensure we don't
 	 * have a race condition */
 	forceinfokey(world, "sci_count", "0");
-
-	/* realistic is an odd name, allow people to use sv_gamemode as an alias */
-	if (cvar("sv_gamemode")) {
-	cvar_set("sh_realistic",cvar_string("sv_gamemode"));
-	} else {
-	cvar_set("sv_gamemode",cvar_string("sh_realistic"));
-	}
 
 	/* if the previous map set this value but the current doesn't
 	 * then set the default */
@@ -538,6 +553,7 @@ SHTeamRules::PlayerSpawn(NSClientPlayer pp)
 {
 	player pl = (player)pp;
 
+	print(sprintf("team: %d\n", pl.team));
 	if (pl.team > 0) {
 		super::PlayerSpawn(pl);
 		return;
@@ -545,15 +561,6 @@ SHTeamRules::PlayerSpawn(NSClientPlayer pp)
 
 	pl.MakeTempSpectator(); /* replace this with a non-spectator ghost */
 	Spawn_ObserverCam(pl);
-}
-
-void
-SHTeamRules::PlayerTeamSpawn(NSClientPlayer pl)
-{
-	int red = 0;
-	int blue = 0;
-
-	super::PlayerSpawn(pl);
 }
 
 void
@@ -667,10 +674,41 @@ SHInvasionRules::PlayerDeath(NSClientPlayer pl)
 
 }
 
+string
+SHInvasionRules::Title(void)
+{
+	return ("Invasion");
+}
+
 void
 SHInvasionRules::SHInvasionRules(void)
 {
 
+}
+
+
+
+void
+TriggerFlashlight(NSClient target)
+{
+	entity oldself = self;
+	self = target;
+	Flashlight_Toggle();
+	self = oldself;
+}
+
+bool
+HLGameRules::ImpulseCommand(NSClient bp, float num)
+{
+	switch (num) {
+	case 100:
+		TriggerFlashlight(bp);
+		break;
+	default:
+		return super::ImpulseCommand(bp, num);
+	}
+
+	return true;
 }
 
 void
@@ -704,7 +742,7 @@ CSEv_JoinAuto(void)
 
 	forceinfokey(pl, "*team", sprintf("%d", pl.team));
 
-	rules.PlayerTeamSpawn(pl);
+	rules.PlayerSpawn(pl);
 }
 
 void
@@ -720,8 +758,9 @@ CSEv_JoinTeam_f(float teamNumber)
 
 	pl.team = teamNumber;
 	forceinfokey(pl, "*team", sprintf("%d", pl.team));
+	breakpoint();
 
-	rules.PlayerTeamSpawn(pl);
+	rules.PlayerSpawn(pl);
 }
 
 void

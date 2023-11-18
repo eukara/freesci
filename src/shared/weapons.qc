@@ -20,6 +20,7 @@ weapon_t g_weapons[] = {
 	w_crowbar,
 	w_hammer,
 	w_chainsaw,
+	w_needle,
 	w_glock,
 	w_python,
 	w_mp5,

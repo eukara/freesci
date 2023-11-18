@@ -24,6 +24,8 @@ class HLGameRules:CGameRules
 	/* client */
 	virtual void(NSClientPlayer) PlayerSpawn;
 	virtual void(NSClientPlayer) PlayerDeath;
+	virtual bool PlayerRequestRespawn(NSClientPlayer);
+	virtual bool ImpulseCommand(NSClient, float);
 	virtual void(NSClientPlayer) PlayerPostFrame;
 	virtual void(NSClientPlayer, entity) ScientistKill;
 	virtual void(void) RegisterSciDeath;
@@ -55,7 +57,6 @@ class SHTeamRules:HLGameRules
 
 	virtual void(void) RestartRound;
 	virtual void(NSClientPlayer) PlayerSpawn;
-	virtual void(NSClientPlayer) PlayerTeamSpawn;
 	virtual bool(void) IsTeamplay;
 	virtual void(void) AddTeam1Kill;
 	virtual void(void) AddTeam2Kill;
@@ -68,6 +69,8 @@ class SHInvasionRules:HLGameRules
 {
 	void(void) SHInvasionRules;
 	virtual void(void) RegisterSciDeath;
+
+	virtual string Title(void);
 };
 
 /* Standard Hunting (0):
@@ -76,6 +79,8 @@ class SHInvasionRules:HLGameRules
 class SHGameHunt:SHTeamRules
 {
 	void(void) SHGameHunt;
+
+	virtual string Title(void);
 };
 
 /* Stealth Hunting (1):
@@ -84,6 +89,8 @@ class SHGameHunt:SHTeamRules
 class SHGameStealth:SHTeamRules
 {
 	void(void) SHGameStealth;
+
+	virtual string Title(void);
 };
 
 /* Traditional Slaughter (2):
@@ -92,14 +99,19 @@ class SHGameStealth:SHTeamRules
 class SHGameSlaughter:HLGameRules
 {
 	void(void) SHGameSlaughter;
+
+	virtual string Title(void);
 };
 
 /* Live in Fear (3):
 	Unique round-based gamemode where players have to only kill an evil randomly selected player controlled scientist causing chaos. Those who kill good scientists are punished with lost points. The evil scientist gains one point from every kill (NPC or Players). Scientists respawn.
 */
-class SHGameFear:HLGameRules
+class SHGameFear:SHTeamRules
 {
 	void(void) SHGameFear;
+	virtual void(NSClientPlayer, entity) ScientistKill;
+
+	virtual string Title(void);
 };
 
 /* Madness (4):
@@ -108,6 +120,8 @@ class SHGameFear:HLGameRules
 class SHGameMadness:HLGameRules
 {
 	void(void) SHGameMadness;
+
+	virtual string Title(void);
 };
 
 /* Invasion (5):
@@ -116,6 +130,8 @@ class SHGameMadness:HLGameRules
 class SHGameInvasion:SHInvasionRules
 {
 	void(void) SHGameInvasion;
+
+	virtual string Title(void);
 };
 
 typedef enum

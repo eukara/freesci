@@ -16,6 +16,7 @@
 
 
 #include "../../../valve/src/shared/skeleton.h"
+#include "scianims.h"
 
 /* all custom SendFlags bits we can possibly send */
 enumflags
@@ -76,6 +77,7 @@ class player:NSClientPlayer
 	PREDICTED_FLOAT(sh_insanetime)
 	PREDICTED_FLOAT(sh_insaneactive)
 
+	virtual bool IsScientist(void);
 	virtual void Physics_Jump(void);
 	virtual void UpdatePlayerAnimation(float);
 
@@ -83,6 +85,8 @@ class player:NSClientPlayer
 	virtual float Physics_MaxSpeed(void);
 	virtual void Physics_InputPreMove(void);
 	virtual void Physics_InputPostMove(void);
+	virtual void Physics_SetViewParms(void);
+	virtual void Physics_Crouch(void);
 
 #ifdef CLIENT
 	////virtual void(void) draw;
@@ -103,14 +107,116 @@ class player:NSClientPlayer
 #endif
 };
 
+void
+SHSciAnim_PlayerUpdate(NSClientPlayer playerTarget)
+{
+	bool useTopAnim;
+	player pl = (player)playerTarget;
+
+	if (pl.anim_top_delay <= 0.0f) {
+		useTopAnim = false;
+	} else {
+		useTopAnim = true;
+	}
+
+	if (vlen(pl.velocity) == 0) {
+		pl.frame = SCIANIM_IDLE1;
+	} else if (vlen(pl.velocity) < 150) {
+		pl.frame = SCIANIM_WALK;
+	} else if (vlen(pl.velocity) > 150) {
+		pl.frame = SCIANIM_RUN;
+	}
+
+	if (useTopAnim) {
+		pl.frame = pl.anim_top;
+	}
+
+	pl.baseframe = 0;
+	pl.basebone = 0;
+	pl.frame1time = pl.anim_top_time;
+}
+
+bool
+player::IsScientist(void)
+{
+#ifdef CLIENT
+	float myTeam = getplayerkeyfloat(this.entnum-1, "*team");
+#else
+	float myTeam = team;
+#endif
+
+	return myTeam == 1 ? true : false;
+}
+
+#ifndef PHY_VIEWPOS
+	#define PHY_VIEWPOS [0,0,28]
+#endif
+
+#ifndef PHY_VIEWPOS_CROUCHED
+	#define PHY_VIEWPOS_CROUCHED [0,0,12]
+#endif
+#ifndef PHY_HULL_MIN
+	#define PHY_HULL_MIN [-16,-16,-36]
+#endif
+
+#ifndef PHY_HULL_MAX
+	#define PHY_HULL_MAX [16,16,36]
+#endif
+
+#ifndef PHY_HULL_CROUCHED_MIN
+	#define PHY_HULL_CROUCHED_MIN [-16,-16,-18]
+#endif
+
+#ifndef PHY_HULL_CROUCHED_MAX
+	#define PHY_HULL_CROUCHED_MAX [16,16,18]
+#endif
+
+
+void
+player::Physics_Crouch(void)
+{
+	if (IsScientist() == true) {
+		view_ofs = PHY_VIEWPOS + [0,0, 36];
+		return;
+	}
+
+	super::Physics_Crouch();
+}
+
+void
+player::Physics_SetViewParms(void)
+{
+	vector bboxOffset = g_vec_null;
+
+	if (IsScientist() == true) {
+		bboxOffset = [0, 0, 36];
+	}
+
+	if (GetFlags() & FL_CROUCHING) {
+		mins = PHY_HULL_CROUCHED_MIN;
+		maxs = PHY_HULL_CROUCHED_MAX;
+		view_ofs = PHY_VIEWPOS_CROUCHED;
+	} else {
+		mins = PHY_HULL_MIN;
+		maxs = PHY_HULL_MAX;
+		view_ofs = PHY_VIEWPOS;
+	}
+	SetSize(mins + bboxOffset, maxs + bboxOffset);
+}
+
 void Animation_PlayerUpdate(player); 
 void Animation_TimerUpdate(player, float); 
 
 void
 player::UpdatePlayerAnimation(float timelength)
 {
-	/* calculate our skeletal progression */
-	Animation_PlayerUpdate(this);
+	if (IsScientist() == true) {
+		SHSciAnim_PlayerUpdate(this);
+	} else {
+		/* calculate our skeletal progression */
+		Animation_PlayerUpdate(this);
+	}
+
 	/* advance animation timers */
 	Animation_TimerUpdate(this, timelength);
 }
@@ -152,9 +258,15 @@ player::UpdateAliveCam(void)
 .string oldmodel;
 string Weapons_GetPlayermodel(player, int);
 
+
 void
 player::UpdatePlayerAttachments(bool visible)
 {
+	if (IsScientist()) {
+		p_model.modelindex = 0;
+		return;
+	}
+
 	/* draw the flashlight */
 	if (gflags & GF_FLASHLIGHT) {
 		vector src;

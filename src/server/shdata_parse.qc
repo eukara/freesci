@@ -29,7 +29,7 @@ SHData_SpawnScientist(void)
 		}
 		slimit++;
 	}
-	spawnfunc_monster_scientist();
+	//spawnfunc_monster_scientist();
 }
 
 void
@@ -87,6 +87,11 @@ SHData_NewAngles(void)
 void
 SHData_GetItems(player pl)
 {
+	if (pl.IsScientist() == true) {
+		Weapons_AddItem(pl, WEAPON_NEEDLE, -1);
+		return;
+	}
+
 	/* TODO: Parse the config files */
 	pl.ammo_9mm = 68;
 	pl.ammo_buckshot = 34;
