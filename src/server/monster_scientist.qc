@@ -420,31 +420,31 @@ SHScientist::Respawn(void)
 
 	if ((cvar("sh_scirand") == 1) || (m_iBody == 0)) {
 		m_iBody = floor(random(1,5));
-	}
 
-	SetSkin(0);
+		SetSkin(0);
 
-	switch (m_iBody) {
-		case 1:
-			m_flPitch = 105;
-			netname = "Walter";
-			SetBodyInGroup(1, 1);
-			break;
-		case 2:
-			m_flPitch = 100;
-			netname = "Einstein";
-			SetBodyInGroup(1, 2);
-			break;
-		case 3:
-			m_flPitch = 95;
-			netname = "Luther";
-			SetBodyInGroup(1, 3);
-			SetSkin(1);
-			break;
-		default:
-			m_flPitch = 100;
-			netname = "Slick";
-			SetBodyInGroup(1, 4);
+		switch (m_iBody) {
+			case 1:
+				m_flPitch = 105;
+				netname = "Walter";
+				SetBodyInGroup(1, 1);
+				break;
+			case 2:
+				m_flPitch = 100;
+				netname = "Einstein";
+				SetBodyInGroup(1, 2);
+				break;
+			case 3:
+				m_flPitch = 95;
+				netname = "Luther";
+				SetBodyInGroup(1, 3);
+				SetSkin(1);
+				break;
+			default:
+				m_flPitch = 100;
+				netname = "Slick";
+				SetBodyInGroup(1, 4);
+		}
 	}
 
 	/* recount to update sciscore and so on */
