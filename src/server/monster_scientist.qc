@@ -418,23 +418,26 @@ SHScientist::Respawn(void)
 		m_iFlags |= MONSTER_FEAR;
 	}
 
-	if ((cvar("sh_scirand") == 1) || (m_iBody == 0)) {
+	if (m_iBody <= 0i)
+		m_iBody = 0i;
+
+	if ((cvar("sh_scirand") == 1) || (m_iBody == 0i)) {
 		m_iBody = floor(random(1,5));
 
 		SetSkin(0);
 
 		switch (m_iBody) {
-			case 1:
+			case 1i:
 				m_flPitch = 105;
 				netname = "Walter";
 				SetBodyInGroup(1, 1);
 				break;
-			case 2:
+			case 2i:
 				m_flPitch = 100;
 				netname = "Einstein";
 				SetBodyInGroup(1, 2);
 				break;
-			case 3:
+			case 3i:
 				m_flPitch = 95;
 				netname = "Luther";
 				SetBodyInGroup(1, 3);
