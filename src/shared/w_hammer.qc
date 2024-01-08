@@ -125,6 +125,7 @@ void w_hammer_release(player pl)
 
 			Damage_Apply(trace_ent, self, hdmg, WEAPON_HAMMER, DMG_BLUNT);
 
+			makevectors(pl.v_angle);
 			if (trace_ent.classname == "monster_scientist") {
 				trace_ent.movetype = MOVETYPE_TOSS;
 				trace_ent.velocity = v_forward * 768 + v_up * 256;
