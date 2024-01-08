@@ -48,10 +48,8 @@ Game_Worldspawn(void)
 {
 	precache_model("models/player.mdl");
 	precache_model("models/w_weaponbox.mdl");
-	Sound_Precache("player.die");
-	Sound_Precache("player.insane");
-	Sound_Precache("player.fall");
-	Sound_Precache("player.lightfall");
+	Sound_Precache("Player.FlashLightOff");
+	Sound_Precache("Player.FlashLightOn");
 
 	Player_Precache();
 	Weapons_Init();
