@@ -1,0 +1,65 @@
+entityDef weapon_hammer
+{
+	"editor_color"		".3 .3 1"
+	"editor_mins"		"-16 -16 -16"
+	"editor_maxs"		"16 16 16"
+	"editor_usage"		"Hammer"
+	"editor_rotatable"	"1"
+
+	"spawnclass"		"HLWeapon"
+	"model"				"models/p_hammer.mdl"
+	"model_view"		"models/v_hammer.mdl"
+	"snd_acquire"		"weapon.pickup"
+	"snd_respawn"		"item.respawn"
+	"snd_idle"			"weapon_hammer.idle"
+	"snd_hit"			"weapon_hammer.hit"
+	"snd_miss"			"weapon_hammer.miss"
+
+	// weapon specific
+	"def_melee"			"damage_hammer"
+	"def_meleeAlt"		"damage_hammerWindup"
+	"melee_distance"	"32"
+	"inv_name"			"Hammer"
+	"ammoType"			""
+	"ammoRequired"		"0"
+	"clipSize"			"0"
+
+	"meleeRateMiss"		"1.0"
+	"meleeRateHit"		"1.0"
+
+	"actIdle"			"0,5,6"
+	"actDraw"			"1"
+	"actHolster"		"2,7,8"
+	"actMeleeMiss"		"3"
+	"actMeleeHit"		"3"
+
+	// HLWeapon specific
+	"hudSlot"		"0"
+	"hudSlotPos"	"1"
+	"weight"		"1"
+	"crosshair"		"none"
+	"ammoIcon"		"none"
+}
+
+
+// TODO double check push/knockback works on victims
+entityDef damage_hammer
+{
+	"damage"			"skill:plr_hammer"
+//	"kickDir"			"-1 0 0"
+//	"knockback"			"20"
+	"push"				"20000"
+	"gib"				"0"
+
+}
+
+// TODO
+entityDef damage_hammerWindup
+{
+	"damage"			"skill:plr_hammeralt"
+	"gib"				"1"
+	"meleeRateMiss"		"0.75"
+	"meleeRateHit"		"0.75"
+	"actMeleeMiss"		"4"
+	"actMeleeHit"		"4"
+}

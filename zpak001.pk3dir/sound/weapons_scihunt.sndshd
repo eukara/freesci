@@ -1,4 +1,4 @@
-weapon_cannon.shoot
+weapon_handcannon.shoot
 {
 	sample cannon/fire.wav
 }

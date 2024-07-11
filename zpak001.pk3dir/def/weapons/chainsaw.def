@@ -1,0 +1,56 @@
+entityDef weapon_chainsaw
+{
+	"editor_color"		".3 .3 1"
+	"editor_mins"		"-16 -16 -16"
+	"editor_maxs"		"16 16 16"
+	"editor_usage"		"Chainsaw"
+	"editor_rotatable"	"1"
+
+	"spawnclass"		"HLWeapon"
+	"model"				"models/p_saw.mdl"
+	"model_view"		"models/v_chainsaw.mdl"
+	"snd_acquire"		"weapon.pickup"
+	"snd_respawn"		"item.respawn"
+	"snd_idle"			"weapon_chainsaw.idle"
+
+	// weapon specific
+	"def_melee"			"damage_chainsaw"
+	"melee_distance"	"32"
+// TODO need velocity push on player (32 units each hit)
+	"inv_name"			"Chainsaw"
+	"ammoType"			""
+	"ammoRequired"		"0"
+	"clipSize"			"0"
+
+	"meleeRateMiss"		"0.5"
+	"meleeRateHit"		"0.25"
+
+	"actIdle"			"5,6"
+	"actDraw"			"3"
+	"actHolster"		"4"
+	"actMeleeStart"		"0"
+	"actMeleeMiss"		"1"
+	"actMeleeHit"		"1"
+	"actMeleeStop"		"2"
+
+	// HLWeapon specific
+	"hudSlot"		"0"
+	"hudSlotPos"	"2"
+	"weight"		"1"
+	"crosshair"		"none"
+	"ammoIcon"		"none"
+}
+
+// TODO sh_chainspark and fx_spark.main
+
+entityDef damage_chainsaw
+{
+	"damage"			"skill:plr_chainsaw"
+//	"kickDir"			"-1 0 0"
+//	"knockback"			"20"
+//	"push"				"20000"
+	"gib"				"1"
+
+	"snd_hit"			"weapon_chainsaw.hit"
+	"snd_miss"			"weapon_chainsaw.miss"
+}

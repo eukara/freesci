@@ -1,0 +1,41 @@
+entityDef weapon_needle
+{
+	"editor_color"		".3 .3 1"
+	"editor_mins"		"-16 -16 -16"
+	"editor_maxs"		"16 16 16"
+	"editor_usage"		"Needle"
+	"editor_rotatable"	"1"
+
+	"spawnclass"		"HLWeapon"
+
+	// weapon specific
+	"def_melee"			"damage_needle"
+	"melee_distance"	"32"
+	"inv_name"			"Needle"
+	"ammoType"			""
+	"ammoRequired"		"0"
+	"clipSize"			"0"
+
+	"meleeRateMiss"		"0.5"
+	"meleeRateHit"		"0.25"
+
+
+	// HLWeapon specific
+	"hudSlot"		"0"
+	"hudSlotPos"	"4"
+	"weight"		"0"
+	"crosshair"		"none"
+	"ammoIcon"		"none"
+}
+
+entityDef damage_needle
+{
+	"damage"			"skill:plr_needle"
+//	"kickDir"			"-1 0 0"
+//	"knockback"			"20"
+//	"push"				"20000"
+	"gib"				"0"
+
+	"snd_hit"			"weapon_needle.hit"
+	"snd_miss"			"weapon_needle.miss"
+}

@@ -1,0 +1,87 @@
+entityDef weapon_handcannon
+{
+	"editor_color"		".3 .3 1"
+	"editor_mins"		"-16 -16 -16"
+	"editor_maxs"		"16 16 16"
+	"editor_usage"		"Hand Cannon"
+	"editor_rotatable"	"1"
+
+	"spawnclass"		"HLWeapon"
+	"model"				"models/p_cannon.mdl"
+	"model_view"		"models/v_cannon.mdl"
+	"snd_acquire"		"weapon.pickup"
+	"snd_respawn"		"item.respawn"
+
+	// weapon specific
+	"def_fireInfo"		"fireInfo_handcannon"
+	"def_altFireInfo"	"fireInfo_altCannon"
+	"inv_name"			"Hand Cannon"
+	"clipSize"			"2"
+
+	"actHolster"		"5"
+	"actReload"			"3"
+	"actDraw"			"4"
+	"actIdle"			"6,7"
+
+	"snd_fire"			"weapon_handcannon.shoot"
+	"snd_empty"			"weapon_shotgun.empty"
+
+	// HLWeapon specific
+	"hudSlot"		"2"
+	"hudSlotPos"	"3"
+	"weight"		"15"
+}
+
+entityDef projectile_handcannon_single
+{
+	"inherit"		"projectile_bullet_base"
+	"damage"		"skill:plr_handcannon"
+	"hitscans"		"12"
+	"spread"		"0.08716 0.04362"
+}
+
+entityDef projectile_handcannon
+{
+	"inherit"		"projectile_bullet_base"
+	"damage"		"skill:plr_handcannon"
+	"hitscans"		"24"
+	"spread"		"0.08716 0.04362"
+}
+
+entityDef fireInfo_handcannon
+{
+	"def_projectile"	"projectile_handcannon"
+	"ammoType"			"ammo_buckshot"
+	"ammoRequired"		"2"
+	"ammoPerShot"		"2"
+	"fireRate"			"1.5"
+	"actFire"			"0"
+	"model_flash"		"sprites/muzzleflash2.spr"
+
+}
+
+entityDef fireInfo_altCannon
+{
+	"def_projectile"	"projectile_handcannon_single"
+	"ammoType"			"ammo_buckshot"
+	"ammoRequired"		"1"
+	"ammoPerShot"		"1"
+	"fireRate"			"1.5"
+	"actFire"			"1,2"
+	"model_flash"		"sprites/muzzleflash2.spr"
+
+}
+
+// TODO respect sh_hchorror = 1
+
+entityDef fireInfo_handcannonHorror
+{
+	"def_projectile"	"projectile_handcannon"
+	"ammoType"			"ammo_buckshot"
+	"ammoRequired"		"0"
+	"ammoPerShot"		"0"
+	"fireRate"			"0.5"
+	"actFire"			"0"
+	"model_flash"		"sprites/muzzleflash2.spr"
+
+}

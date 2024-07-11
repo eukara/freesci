@@ -1,0 +1,44 @@
+entityDef info_player_start
+{
+	"editor_mins" "-16 -16 -36"
+	"editor_maxs" "16 16 36"
+	"editor_description" "Singleplayer Spawn Point"
+	"editor_color" "1 0 0"
+	"spawnclass" "NSSpawnPoint"
+}
+
+entityDef info_player_deathmatch
+{
+	"editor_mins" "-16 -16 -36"
+	"editor_maxs" "16 16 36"
+	"editor_description" "Deathmatch Spawn Point"
+	"editor_color" "1 0 0"
+	"spawnclass" "NSSpawnPoint"
+}
+
+entityDef info_player_coop
+{
+	"editor_mins" "-16 -16 -36"
+	"editor_maxs" "16 16 36"
+	"editor_description" "Cooperative Spawn Point"
+	"editor_color" "1 0 0"
+	"spawnclass" "NSSpawnPoint"
+}
+
+entityDef info_player_team1
+{
+	"editor_mins" "-16 -16 -36"
+	"editor_maxs" "16 16 36"
+	"editor_description" "Red Team Spawn Point"
+	"editor_color" "1 0 0"
+	"spawnclass" "NSSpawnPoint"
+}
+
+entityDef info_player_team2
+{
+	"editor_mins" "-16 -16 -36"
+	"editor_maxs" "16 16 36"
+	"editor_description" "Blue Team Spawn Point"
+	"editor_color" "0 0 1"
+	"spawnclass" "NSSpawnPoint"
+}
