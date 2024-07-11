@@ -29,7 +29,8 @@ SHData_SpawnScientist(void)
 		}
 		slimit++;
 	}
-	//spawnfunc_monster_scientist();
+
+	EntityDef_SpawnClassname("monster_scientist");
 }
 
 void
@@ -41,7 +42,7 @@ SHData_New(void)
 	new.origin[2] = stof(argv(3));
 
 	if (autocvar_sh_sciyaw) {
-		new.angles[1] = Math_FixDelta(random(0,360));
+		new.angles[1] = fixAngleDelta(random(0,360));
 	}
 
 	setorigin(new, new.origin);
@@ -85,38 +86,38 @@ SHData_NewAngles(void)
 }
 
 void
-SHData_GetItems(player pl)
+SHData_GetItems(SHPlayer pl)
 {
 	if (pl.IsScientist() == true) {
-		Weapons_AddItem(pl, WEAPON_NEEDLE, -1);
+		pl.GiveItem("weapon_needle");
 		return;
 	}
 
 	/* TODO: Parse the config files */
-	pl.ammo_9mm = 68;
-	pl.ammo_buckshot = 34;
-	pl.ammo_bolt = 50;
-	pl.ammo_357 = 36;
-	pl.ammo_m203_grenade = 3;
-	pl.ammo_rocket = 5;
-	pl.ammo_snark = 10;
-	Weapons_AddItem(pl, WEAPON_CROWBAR, -1);
-	Weapons_AddItem(pl, WEAPON_GLOCK, -1);
-	Weapons_AddItem(pl, WEAPON_PYTHON, -1);
-	Weapons_AddItem(pl, WEAPON_MP5, -1);
-	Weapons_AddItem(pl, WEAPON_SHOTGUN, -1);
-	Weapons_AddItem(pl, WEAPON_CROSSBOW, -1);
-	Weapons_AddItem(pl, WEAPON_RPG, -1);
-	Weapons_AddItem(pl, WEAPON_GAUSS, -1);
-	Weapons_AddItem(pl, WEAPON_EGON, -1);
-	Weapons_AddItem(pl, WEAPON_HORNETGUN, -1);
-	Weapons_AddItem(pl, WEAPON_HANDGRENADE, -1);
-	Weapons_AddItem(pl, WEAPON_SATCHEL, -1);
-	Weapons_AddItem(pl, WEAPON_TRIPMINE, -1);
-	Weapons_AddItem(pl, WEAPON_SNARK, -1);
-	Weapons_AddItem(pl, WEAPON_CANNON, -1);
-	Weapons_AddItem(pl, WEAPON_CHAINSAW, -1);
-	Weapons_AddItem(pl, WEAPON_HAMMER, -1);
+	pl.GiveAmmo(ammoNumForName("ammo_9mm"), 68);
+	pl.GiveAmmo(ammoNumForName("ammo_buckshot"), 34);
+	pl.GiveAmmo(ammoNumForName("ammo_bolt"), 50);
+	pl.GiveAmmo(ammoNumForName("ammo_357"), 36);
+	pl.GiveAmmo(ammoNumForName("ammo_m203_grenade"), 3);
+	pl.GiveAmmo(ammoNumForName("ammo_rocket"), 5);
+	pl.GiveAmmo(ammoNumForName("ammo_snark"), 10);
+	pl.GiveItem("weapon_crowbar");
+	pl.GiveItem("weapon_9mmhandgun");
+	pl.GiveItem("weapon_357");
+	pl.GiveItem("weapon_9mmAR");
+	pl.GiveItem("weapon_shotgun");
+	pl.GiveItem("weapon_crossbow");
+	pl.GiveItem("weapon_rpg");
+	pl.GiveItem("weapon_gauss");
+	pl.GiveItem("weapon_egon");
+	pl.GiveItem("weapon_hornetgun");
+	pl.GiveItem("weapon_handgrenade");
+	pl.GiveItem("weapon_satchel");
+	pl.GiveItem("weapon_tripmine");
+	pl.GiveItem("weapon_snark");
+	pl.GiveItem("weapon_handcannon");
+	pl.GiveItem("weapon_chainsaw");
+	pl.GiveItem("weapon_hammer");
 }
 
 void

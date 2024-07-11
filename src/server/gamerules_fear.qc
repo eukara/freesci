@@ -8,7 +8,7 @@ SHGameFear::SHGameFear(void)
 void
 SHGameFear::ScientistKill(NSClientPlayer pp, entity sci)
 {
-	player pl = (player)pp;
+	SHPlayer pl = (SHPlayer)pp;
 
 	if (pl.IsScientist() == true) {
 		pl.frags++;

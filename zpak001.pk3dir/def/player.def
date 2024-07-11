@@ -1,4 +1,4 @@
 entityDef player
 {
-	"spawnclass" "HLPlayer"
+	"spawnclass" "SHPlayer"
 }

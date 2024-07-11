@@ -5,6 +5,7 @@
 #define CSQC
 #define CLIENT
 #define VALVE
+#define SCIHUNT
 #define CLASSIC_VGUI
 
 #includelist
@@ -23,7 +24,7 @@ defs.h
 draw.qc
 init.qc
 ../../../valve/src/client/flashlight.qc
-../../../valve/src/client/entities.qc
+entities.qc
 cmds.qc
 ../../../valve/src/client/game_event.qc
 ../../../valve/src/client/camera.qc
@@ -31,9 +32,9 @@ cmds.qc
 ../../../valve/src/client/obituary.qc
 ../../../valve/src/client/hud_ammonotify.qc
 ../../../valve/src/client/hud_dmgnotify.qc
+../../../valve/src/client/hud_sprite.qc
 ../../../valve/src/client/hud_itemnotify.qc
 hud.qc
-../../../valve/src/client/hud_sprite.qc
 ../../../valve/src/client/hud_weaponselect.qc
 ../../../valve/src/client/scoreboard.qc
 

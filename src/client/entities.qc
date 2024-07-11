@@ -14,25 +14,22 @@
  * OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-weapon_t w_null = {};
-weapon_t g_weapons[] = {
-	w_null,
-	w_crowbar,
-	w_hammer,
-	w_chainsaw,
-	w_needle,
-	w_glock,
-	w_python,
-	w_mp5,
-	w_shotgun,
-	w_crossbow,
-	w_cannon,
-	w_rpg,
-	w_gauss,
-	w_egon,
-	w_hornetgun,
-	w_handgrenade,
-	w_satchel,
-	w_tripmine,
-	w_snark
-};
+int
+ClientGame_EntityUpdate(float id, float new)
+{
+	switch (id) {
+	case ENT_TRIPMINE:
+		NSENTITY_READENTITY(HLTripmine, new)
+		break;
+	case ENT_WEAPON:
+		NSENTITY_READENTITY(HLWeapon, new)
+		break;
+	case ENT_PLAYER:
+		NSENTITY_READENTITY(SHPlayer, new)
+		break;
+	default:
+		return (0);
+	}
+
+	return (1);
+}

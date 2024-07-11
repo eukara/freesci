@@ -52,7 +52,6 @@ Game_Worldspawn(void)
 	Sound_Precache("Player.FlashLightOn");
 
 	Player_Precache();
-	Weapons_Init();
 	SHData_Parse(mapname);
 	FX_Corpse_Init();
 }

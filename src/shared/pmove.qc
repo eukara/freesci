@@ -34,7 +34,7 @@
 /* insanity changes player move and attack speed 
  * so lets override some base player functions */
 void
-player::Physics_InputPreMove(void)
+SHPlayer::Physics_InputPreMove(void)
 {
 	float insanecooldown;
 
@@ -51,7 +51,7 @@ player::Physics_InputPreMove(void)
  * easier to do this to every weapon, plus it's more fun
  * FIXME reloading is borked when active */
 void
-player::Physics_InputPostMove(void)
+SHPlayer::Physics_InputPostMove(void)
 {
 	super::Physics_InputPostMove();
 	if (gflags & GF_MADNESS) {
@@ -60,7 +60,7 @@ player::Physics_InputPostMove(void)
 }
 
 float
-player::Physics_MaxSpeed(void)
+SHPlayer::Physics_MaxSpeed(void)
 {
 	if (gflags & GF_MADNESS) {
 		return 1000.0f;
@@ -70,7 +70,7 @@ player::Physics_MaxSpeed(void)
 }
 
 void
-player::Physics_Jump(void)
+SHPlayer::Physics_Jump(void)
 {
 	if (waterlevel >= 2) {
 		if (watertype == CONTENT_WATER) {
@@ -82,7 +82,7 @@ player::Physics_Jump(void)
 		}
 	} else {
 		/* Half-Life: Longjump module */
-		if (flags & FL_CROUCHING && g_items & 0x00008000i) {
+		if (IsCrouching() && g_items & 0x00008000i) {
 			makevectors([0, v_angle[1], 0]);
 			velocity = v_forward * 512;
 			velocity[2] += 100;

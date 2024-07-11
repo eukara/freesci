@@ -17,6 +17,9 @@ entityDef weapon_handcannon
 	"def_altFireInfo"	"fireInfo_altCannon"
 	"inv_name"			"Hand Cannon"
 	"clipSize"			"2"
+	"ammoType"			"ammo_buckshot"
+	"ammoRequired"		"1"
+	"model_flash"		"sprites/muzzleflash2.spr"
 
 	"actHolster"		"5"
 	"actReload"			"3"
@@ -50,38 +53,25 @@ entityDef projectile_handcannon
 
 entityDef fireInfo_handcannon
 {
-	"def_projectile"	"projectile_handcannon"
-	"ammoType"			"ammo_buckshot"
-	"ammoRequired"		"2"
+	"def_onFire"	"projectile_handcannon"
 	"ammoPerShot"		"2"
 	"fireRate"			"1.5"
 	"actFire"			"0"
-	"model_flash"		"sprites/muzzleflash2.spr"
-
 }
 
 entityDef fireInfo_altCannon
 {
-	"def_projectile"	"projectile_handcannon_single"
-	"ammoType"			"ammo_buckshot"
-	"ammoRequired"		"1"
+	"def_onFire"	"projectile_handcannon_single"
 	"ammoPerShot"		"1"
 	"fireRate"			"1.5"
 	"actFire"			"1,2"
-	"model_flash"		"sprites/muzzleflash2.spr"
-
 }
 
 // TODO respect sh_hchorror = 1
-
 entityDef fireInfo_handcannonHorror
 {
-	"def_projectile"	"projectile_handcannon"
-	"ammoType"			"ammo_buckshot"
-	"ammoRequired"		"0"
-	"ammoPerShot"		"0"
+	"def_onFire"	"projectile_handcannon"
 	"fireRate"			"0.5"
 	"actFire"			"0"
-	"model_flash"		"sprites/muzzleflash2.spr"
-
+	"ammoRequired"		"0"
 }

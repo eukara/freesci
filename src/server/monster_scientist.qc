@@ -71,25 +71,25 @@ enum
 
 class SHScientist:NSTalkMonster
 {
-	void(void) SHScientist;
+	void SHScientist(void);
 
 	/* override */
-	virtual void(void) SeeThink;
-	virtual float(void) GetWalkSpeed;
-	virtual float(void) GetChaseSpeed;
-	virtual float(void) GetRunSpeed;
-	virtual void(void) PanicFrame;
+	virtual void SeeThink(void);
+	virtual float GetWalkSpeed(void);
+	virtual float GetChaseSpeed(void);
+	virtual float GetRunSpeed(void);
+	virtual void PanicFrame(void);
 
-	virtual void(void) Respawn;
-	virtual void(void) Pain;
-	virtual void(void) Death;
-	virtual void(void) PlayerUse;
-	virtual void(void) TalkPanic;
+	virtual void Respawn(void);
+	virtual void Pain(entity, entity, int, vector, int);
+	virtual void Death(entity, entity, int, vector, int);
+	virtual void PlayerUse(void);
+	virtual void TalkPanic(void);
 
-	virtual int(void) AttackMelee;
-	virtual void(void) AttackNeedle;
+	virtual int AttackMelee(void);
+	virtual void AttackNeedle(void);
 
-	virtual void(void) FallNoise;
+	virtual void FallNoise(void);
 };
 
 
@@ -200,8 +200,9 @@ SHScientist_NeedleAttack(entity target)
 		}
 	}
 
-	if (isHealed != true)
-	Damage_Apply(target, target.poisonSource, 10, 0, DMG_POISON);
+	if (isHealed != true) {
+	//	Damage_Apply(target, target.poisonSource, 10, 0, DMG_POISON);
+	}
 
 	/* since corpses have "health" do an extra check */
 	if (target.health <= 0)
@@ -336,7 +337,7 @@ SHScientist::PlayerUse(void)
 }
 
 void
-SHScientist::Pain(void)
+SHScientist::Pain(entity inflictor, entity attacker, int damage, vector dir, int location)
 {
 	/* make everyone on edge */
 	WarnAllies();
@@ -354,7 +355,7 @@ SHScientist::Pain(void)
 }
 
 void
-SHScientist::Death(void)
+SHScientist::Death(entity inflictor, entity attacker, int damage, vector dir, int location)
 {
 	bool deathcheck = false;
 	HLGameRules rules = (HLGameRules)g_grMode;
@@ -365,15 +366,15 @@ SHScientist::Death(void)
 
 	if (IsAlive() == true) {
 		SetFrame(SCIA_DIE_SIMPLE + floor(random(0, 6)));
-		rules.ScientistKill((player)g_dmg_eAttacker, (entity)this);
+		rules.ScientistKill((SHPlayer)attacker, (entity)this);
 
-		Plugin_PlayerObituary(g_dmg_eAttacker, this, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
+		Plugin_PlayerObituary(attacker, this, g_dmg_iWeapon, g_dmg_iHitBody, g_dmg_iDamage);
 		Sound_Speak(this, "SHScientist.die");
 		deathcheck = true;
 	}
 
 	/* now mark our state as 'dead' */
-	super::Death();
+	super::Death(inflictor, attacker, damage, dir, location);
 
 	/* now we'll tell our kill function about it, since we're now legally dead */
 	if (deathcheck == true) {

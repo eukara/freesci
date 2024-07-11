@@ -16,6 +16,7 @@
 
 #include "../../../valve/src/client/obituary.h"
 #include "../../../valve/src/client/particles.h"
+#include "../../../valve/src/client/hud_sprite.h"
 
 var int autocvar_cl_autoweaponswitch = TRUE;
 
