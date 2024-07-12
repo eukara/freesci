@@ -51,6 +51,24 @@ Game_Worldspawn(void)
 	Sound_Precache("Player.FlashLightOff");
 	Sound_Precache("Player.FlashLightOn");
 
+	EntityDef_Precache("weapon_crowbar");
+	EntityDef_Precache("weapon_9mmhandgun");
+	EntityDef_Precache("weapon_357");
+	EntityDef_Precache("weapon_9mmAR");
+	EntityDef_Precache("weapon_shotgun");
+	EntityDef_Precache("weapon_crossbow");
+	EntityDef_Precache("weapon_rpg");
+	EntityDef_Precache("weapon_gauss");
+	EntityDef_Precache("weapon_egon");
+	EntityDef_Precache("weapon_hornetgun");
+	EntityDef_Precache("weapon_handgrenade");
+	EntityDef_Precache("weapon_satchel");
+	EntityDef_Precache("weapon_tripmine");
+	EntityDef_Precache("weapon_snark");
+	EntityDef_Precache("weapon_handcannon");
+	EntityDef_Precache("weapon_chainsaw");
+	EntityDef_Precache("weapon_hammer");
+
 	Player_Precache();
 	SHData_Parse(mapname);
 	FX_Corpse_Init();
